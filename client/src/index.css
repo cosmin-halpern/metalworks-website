@@ -1,26 +1,25 @@
-/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* 1. Tailwind’s Base reset and defaults */
 @tailwind base;
-
-/* 2. Tailwind’s component classes (e.g. forms, typography) */
 @tailwind components;
-
-/* 3. Tailwind’s utility classes */
 @tailwind utilities;
 
-/* ——————————————————————————————————————————————
-   You can add your own custom styles below, for example:
-
-   /* Custom fonts */
-/* @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); */
-
-:root {
-    /* Example custom color (if you extend Tailwind config) */
-    /* --brand-blue: theme('colors.blue.600'); */
+body {
+  @apply bg-background text-text min-h-screen;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Example custom utility */
-/* .btn-custom {
-     @apply bg-slate-700 text-white py-2 px-4 rounded-lg hover:bg-slate-600;
-   } */
+.hero-bg {
+  background-image: linear-gradient(to right, theme('colors.primary.DEFAULT'), theme('colors.secondary.DEFAULT'));
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
+  
+  .bg-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary;
+  }
+}

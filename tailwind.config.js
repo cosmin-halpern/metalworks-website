@@ -1,17 +1,1 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-    content: [
-        "./index.html",
-        "./src/**/*.{js,jsx}",
-    ],
-    theme: {
-        extend: {
-            backdropBlur: {
-                sm: '4px',
-                DEFAULT: '8px',
-                md: '12px',
-            },
-        },
-        plugins: [],
-    }
-}
+/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: [\n    \"./index.html\",\n    \"./client/src/**/*.{js,ts,jsx,tsx}\",\n  ],\n  theme: {\n    extend: {\n      colors: {\n        primary: \'\#2563eb\', // Example primary color (blue-600)\n        \'primary-dark\': \'\#1e40af\', // Example darker primary (blue-800)\n        secondary: \'\#dc2626\', // Example secondary color (red-600)\n        \'secondary-dark\': \'\#b91c1c\', // Example darker secondary (red-800)\n        background: \'\#f8fafc\', // Example light background (slate-50)\n        \'background-dark\': \'\#e2e8f0\', // Example slightly darker background (slate-200)\n        text: \'\#1e293b\', // Example text color (slate-900)\n        \'text-light\': \'\#475569\', // Example lighter text (slate-600)\n      },\n    },\n  },\n  plugins: [],\n} 

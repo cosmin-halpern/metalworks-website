@@ -64,4 +64,4 @@ export interface SocialLink {
   platform: 'facebook' | 'instagram' | 'linkedin';
   url: string;
   icon: string;
-} 
+}

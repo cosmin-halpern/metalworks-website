@@ -1,7 +1,6 @@
-import React from "react";
-import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-import { Product } from "@/types";
+import React from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
 
 interface QuoteFormDialogProps {
   open: boolean;
@@ -13,13 +12,13 @@ const QuoteFormDialog: React.FC<QuoteFormDialogProps> = ({ open, setOpen, select
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const message = formData.get("message") as string;
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const message = formData.get('message') as string;
 
-    fetch("http://localhost:3001/api/quote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    fetch('http://localhost:3001/api/quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, message, product: selectedProduct }),
     })
       .then((res) => res.json())
@@ -33,9 +32,7 @@ const QuoteFormDialog: React.FC<QuoteFormDialogProps> = ({ open, setOpen, select
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
 
         {/* Modal Content */}
-        <Dialog.Content
-          className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg focus:outline-none"
-        >
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg focus:outline-none">
           <div className="flex items-center justify-between mb-4">
             <Dialog.Title className="text-xl font-semibold text-slate-800">
               Request Quote
@@ -90,4 +87,4 @@ const QuoteFormDialog: React.FC<QuoteFormDialogProps> = ({ open, setOpen, select
   );
 };
 
-export default QuoteFormDialog; 
+export default QuoteFormDialog;

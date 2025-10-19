@@ -1,5 +1,5 @@
-import React from "react";
-import { Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
+import React from 'react';
+import { Phone, Mail, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 // Define the props interface (even though this component doesn't have props yet,
 // it's good practice to define it for future use)
@@ -45,4 +45,4 @@ const TopBar: React.FC<TopBarProps> = () => {
   );
 };
 
-export default TopBar; 
+export default TopBar;

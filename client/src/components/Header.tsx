@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
-import Button from "./ui/button";
+import { Phone, Mail, Facebook, Instagram, Linkedin } from 'lucide-react';
+import Button from './ui/button';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -98,7 +98,7 @@ const Header = () => {
                     layoutId="activeTab"
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary"
                     initial={false}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}
               </Link>
@@ -136,7 +136,7 @@ const Header = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="md:hidden bg-background shadow-lg overflow-hidden"
           >
             <div className="px-2 pt-2 pb-3 space-y-1">
@@ -162,4 +162,4 @@ const Header = () => {
   );
 };
 
-export default Header; 
+export default Header;

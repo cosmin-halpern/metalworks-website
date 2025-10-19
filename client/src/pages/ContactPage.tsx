@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, ChevronRight } from 'lucide-react';
-import Banner from "../components/Banner";
+import Banner from '../components/Banner';
 import { Link } from 'react-router-dom';
 
 const ContactPage = () => {
@@ -49,9 +49,11 @@ const ContactPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const contactInfo = [
@@ -89,7 +91,9 @@ const ContactPage = () => {
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <nav className="flex items-center space-x-2 text-sm text-gray-500">
-          <Link to="/" className="hover:text-gray-900">Home</Link>
+          <Link to="/" className="hover:text-gray-900">
+            Home
+          </Link>
           <ChevronRight className="h-4 w-4" />
           <span className="text-gray-900">Contact</span>
         </nav>
@@ -273,4 +277,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage; 
+export default ContactPage;

@@ -1,16 +1,16 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // import TopBar from "./components/TopBar"; // Removed separate TopBar
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Header from './components/Header';
+import Footer from './components/Footer';
 // import TestComponent from "./components/TestComponent"; // Removed test component
 
-import HomePage from "./pages/HomePage";
-import WorkPage from "./pages/WorkPage";
-import ServicesPage from "./pages/ServicesPage";
-import ContactPage from "./pages/ContactPage";
-import ProductsPage from "./pages/ProductsPage";
+import HomePage from './pages/HomePage';
+import WorkPage from './pages/WorkPage';
+import ServicesPage from './pages/ServicesPage';
+import ContactPage from './pages/ContactPage';
+import ProductsPage from './pages/ProductsPage';
 
 // Define the type for the App component
 const App: React.FC = () => {
@@ -24,7 +24,9 @@ const App: React.FC = () => {
         <Header />
 
         {/* Page content */}
-        <main className="flex-grow pt-[120px]"> {/* Adjusted padding to account for combined header height */}
+        <main className="flex-grow pt-[120px]">
+          {' '}
+          {/* Adjusted padding to account for combined header height */}
           {/* <TestComponent /> */}
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -41,4 +43,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default App;

@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, ChevronDown } from 'lucide-react';
-import { Product } from "@/types";
-import QuoteFormDialog from "@/features/QuoteFormDialog.tsx";
-import Button from "../components/ui/button";
-import Banner from "../components/Banner";
+import { Product } from '@/types';
+import QuoteFormDialog from '@/features/QuoteFormDialog.tsx';
+import Banner from '../components/Banner';
 
 const products: Product[] = Array.from({ length: 9 }, (_, i) => ({
   id: `product-${i + 1}`,
   name: `Product Model ${i + 1}`,
-  description: "High-quality metal shelving unit for industrial & retail use.",
+  description: 'High-quality metal shelving unit for industrial & retail use.',
   image: `https://placehold.co/400x300/eeeeee/333333?text=Prod+${i + 1}`,
-  category: "Shelving",
+  category: 'Shelving',
   specifications: {
-    "Weight Capacity": "500kg",
-    "Dimensions": "120x60x180cm",
-    "Material": "Steel",
+    'Weight Capacity': '500kg',
+    Dimensions: '120x60x180cm',
+    Material: 'Steel',
   },
 }));
 
@@ -36,17 +35,22 @@ const ProductsPage: React.FC = () => {
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case 'price-asc':
-        return (a.specifications?.WeightCapacity || '').localeCompare(b.specifications?.WeightCapacity || '');
+        return (a.specifications?.WeightCapacity || '').localeCompare(
+          b.specifications?.WeightCapacity || '',
+        );
       case 'price-desc':
-        return (b.specifications?.WeightCapacity || '').localeCompare(a.specifications?.WeightCapacity || '');
+        return (b.specifications?.WeightCapacity || '').localeCompare(
+          a.specifications?.WeightCapacity || '',
+        );
       case 'name':
         return a.name.localeCompare(b.name);
       default:
@@ -112,7 +116,9 @@ const ProductsPage: React.FC = () => {
                 >
                   <Filter className="h-5 w-5" />
                   Filter
-                  <ChevronDown className={`h-5 w-5 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
                 <AnimatePresence>
                   {isFilterOpen && (
@@ -130,7 +136,9 @@ const ProductsPage: React.FC = () => {
                             setIsFilterOpen(false);
                           }}
                           className={`w-full text-left px-4 py-2 hover:bg-background ${
-                            selectedCategory === category ? 'text-secondary bg-secondary/10' : 'text-text'
+                            selectedCategory === category
+                              ? 'text-secondary bg-secondary/10'
+                              : 'text-text'
                           }`}
                         >
                           {category}
@@ -177,7 +185,9 @@ const ProductsPage: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xl font-semibold text-primary">{product.name}</h3>
-                  <span className="text-lg font-bold text-secondary">${product.specifications?.["Weight Capacity"] ?? ''}</span>
+                  <span className="text-lg font-bold text-secondary">
+                    ${product.specifications?.['Weight Capacity'] ?? ''}
+                  </span>
                 </div>
                 <p className="text-text mb-4">{product.description}</p>
                 <div className="space-y-2">
@@ -211,4 +221,4 @@ const ProductsPage: React.FC = () => {
   );
 };
 
-export default ProductsPage; 
+export default ProductsPage;

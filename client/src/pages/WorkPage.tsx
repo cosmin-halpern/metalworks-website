@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Briefcase } from 'lucide-react';
-import Banner from "../components/Banner";
+import Banner from '../components/Banner';
 
 const projects = [
   {
     title: 'Warehouse Racking System',
-    description: 'Custom-designed racking system for a logistics warehouse, maximizing storage and efficiency.',
+    description:
+      'Custom-designed racking system for a logistics warehouse, maximizing storage and efficiency.',
     image: '/public/shelf-1.jpg',
   },
   {
@@ -16,7 +17,8 @@ const projects = [
   },
   {
     title: 'Industrial Workbenches',
-    description: 'Heavy-duty workbenches for a manufacturing facility, built to withstand daily use.',
+    description:
+      'Heavy-duty workbenches for a manufacturing facility, built to withstand daily use.',
     image: '/public/shelf-3.jpg',
   },
 ];
@@ -42,11 +44,10 @@ const WorkPage = () => {
             transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Featured Projects
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We take pride in every project, big or small. Here are a few highlights from our portfolio.
+              We take pride in every project, big or small. Here are a few highlights from our
+              portfolio.
             </p>
           </motion.div>
 
@@ -87,9 +88,7 @@ const WorkPage = () => {
             className="bg-blue-600 rounded-2xl overflow-hidden"
           >
             <div className="px-6 py-12 sm:px-12 lg:px-16 text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Have a Project in Mind?
-              </h2>
+              <h2 className="text-3xl font-bold text-white mb-4">Have a Project in Mind?</h2>
               <p className="text-xl text-blue-100 mb-8">
                 Let's talk about how we can help bring your vision to life.
               </p>
@@ -108,4 +107,4 @@ const WorkPage = () => {
   );
 };
 
-export default WorkPage; 
+export default WorkPage;

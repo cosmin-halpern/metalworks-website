@@ -10,7 +10,11 @@ body {
 }
 
 .hero-bg {
-  background-image: linear-gradient(to right, theme('colors.primary.DEFAULT'), theme('colors.secondary.DEFAULT'));
+  background-image: linear-gradient(
+    to right,
+    theme('colors.primary.DEFAULT'),
+    theme('colors.secondary.DEFAULT')
+  );
 }
 
 /* Custom utility classes */
@@ -18,7 +22,7 @@ body {
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
   }
-  
+
   .bg-gradient {
     @apply bg-gradient-to-r from-primary to-secondary;
   }

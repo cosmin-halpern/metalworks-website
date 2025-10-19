@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle } from 'lucide-react';
-import Banner from "../components/Banner";
+import Banner from '../components/Banner';
 
 const HomePage = () => {
   const features = [
@@ -52,7 +52,8 @@ const HomePage = () => {
               Why Choose Metalworks?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We combine cutting-edge technology with traditional craftsmanship to deliver exceptional results.
+              We combine cutting-edge technology with traditional craftsmanship to deliver
+              exceptional results.
             </p>
           </motion.div>
 
@@ -87,9 +88,7 @@ const HomePage = () => {
             className="bg-blue-600 rounded-2xl overflow-hidden"
           >
             <div className="px-6 py-12 sm:px-12 lg:px-16 text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Ready to Start Your Project?
-              </h2>
+              <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Project?</h2>
               <p className="text-xl text-blue-100 mb-8">
                 Contact us today for a free consultation and quote.
               </p>
@@ -108,4 +107,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;

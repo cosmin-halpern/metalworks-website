@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import Button from '@/components/ui/button';
 
 interface ProductCardProps {
   id: number;
@@ -10,17 +10,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, onQuoteClick }) => {
   const product = {
     id,
     name: `Shelf Model ${id}`,
-    description: "Heavy-duty metal shelving unit suitable for industrial storage or retail displays.",
+    description:
+      'Heavy-duty metal shelving unit suitable for industrial storage or retail displays.',
     image: `/shelf-${id}.jpg`,
   };
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-      <img
-        src={product.image}
-        alt={product.name}
-        className="w-full h-48 object-cover"
-      />
+      <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
       <div className="p-6">
         <h3 className="text-lg font-semibold text-slate-800">{product.name}</h3>
         <p className="text-sm text-gray-600 mb-4">{product.description}</p>
@@ -35,4 +32,4 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, onQuoteClick }) => {
   );
 };
 
-export default ProductCard; 
+export default ProductCard;

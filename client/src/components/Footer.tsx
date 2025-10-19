@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const Footer: React.FC = () => (
   <footer className="w-full py-6 bg-background-dark text-center text-text-light border-t border-background">
@@ -8,4 +8,4 @@ const Footer: React.FC = () => (
   </footer>
 );
 
-export default Footer; 
+export default Footer;

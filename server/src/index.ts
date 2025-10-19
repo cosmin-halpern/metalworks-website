@@ -2,8 +2,9 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { z } from 'zod';
-import { ContactFormData } from '../client/src/types';
-import { sendEmail } from './services/email.js';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import contactRouter from './routes/contact';
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +15,15 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(helmet());
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 // Validation schemas
 const contactFormSchema = z.object({
@@ -34,58 +44,7 @@ const errorHandler = (err: Error, req: Request, res: Response, next: NextFunctio
 };
 
 // Routes
-app.post('/api/contact', async (req: Request, res: Response) => {
-  try {
-    const formData = contactFormSchema.parse(req.body) as ContactFormData;
-    
-    // Send email
-    await sendEmail({
-      from: process.env.SMTP_USER || '',
-      to: process.env.CONTACT_EMAIL || '',
-      subject: `New Contact Form Submission from ${formData.name}`,
-      text: `
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.phone || 'Not provided'}
-Service: ${formData.service || 'Not specified'}
-
-Message:
-${formData.message}
-      `,
-      html: `
-<h2>New Contact Form Submission</h2>
-<p><strong>Name:</strong> ${formData.name}</p>
-<p><strong>Email:</strong> ${formData.email}</p>
-<p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
-<p><strong>Service:</strong> ${formData.service || 'Not specified'}</p>
-<h3>Message:</h3>
-<p>${formData.message}</p>
-      `,
-    });
-    
-    res.json({
-      status: 'success',
-      message: 'Message sent successfully',
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({
-        status: 'error',
-        message: 'Validation failed',
-        errors: error.errors.map(err => ({
-          field: err.path.join('.'),
-          message: err.message,
-        })),
-      });
-    } else {
-      console.error('Error sending email:', error);
-      res.status(500).json({
-        status: 'error',
-        message: 'Failed to send message',
-      });
-    }
-  }
-});
+app.use('/api/contact', contactRouter);
 
 // Apply error handling middleware
 app.use(errorHandler);
@@ -93,4 +52,4 @@ app.use(errorHandler);
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-}); 
+});

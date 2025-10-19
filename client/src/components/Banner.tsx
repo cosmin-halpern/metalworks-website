@@ -47,26 +47,26 @@ const Banner: React.FC<BannerProps> = ({
       {/* Background Image */}
       <AnimatePresence mode="wait">
         {backgroundImage && (
-          <motion.div 
+          <motion.div
             key={backgroundImage}
             initial={{ opacity: 0 }}
             animate={{ opacity: isImageLoaded ? 1 : 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ 
+            style={{
               backgroundImage: `url('${backgroundImage}')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              backgroundRepeat: 'no-repeat',
             }}
           />
         )}
       </AnimatePresence>
-      
+
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/30" />
-      
+
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.h1
@@ -102,4 +102,4 @@ const Banner: React.FC<BannerProps> = ({
   );
 };
 
-export default Banner; 
+export default Banner;

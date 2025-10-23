@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Facebook, Instagram, Linkedin } from 'lucide-react';
-import Button from './ui/button';
+import { Phone, Mail, Instagram, Linkedin } from 'lucide-react';
+import {FaFacebook} from "react-icons/fa";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,10 +19,10 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { path: '/', label: 'Home' },
-    { path: '/services', label: 'Services' },
-    { path: '/products', label: 'Products' },
-    { path: '/work', label: 'Our Work' },
+    { path: '/', label: 'Acasă' },
+    { path: '/services', label: 'Servicii' },
+    { path: '/products', label: 'Produse' },
+    { path: '/work', label: 'Proiectele noastre' },
     { path: '/contact', label: 'Contact' },
   ];
 
@@ -39,23 +39,24 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
               <Phone className="w-3 h-3 mr-1" />
-              <span>+40 123 456 789</span>
+              <span>+40 (768) 515 774</span>
             </div>
             <div className="flex items-center space-x-1">
               <Phone className="w-3 h-3 mr-1" />
-              <span>+40 987 654 321</span>
+              <span>+40 (768) 367 563</span>
             </div>
             <div className="flex items-center space-x-1">
               <Mail className="w-3 h-3 mr-1" />
-              <span>info@metalworks.com</span>
+              <span>office@corsican.ro</span>
             </div>
           </div>
 
           {/* Right side: social icons */}
           <div className="flex items-center space-x-4">
-            <a href="#" aria-label="Facebook" className="hover:text-white transition">
-              <Facebook className="w-4 h-4" />
-            </a>
+              <a href="https://www.facebook.com/p/Corsican-Engineering-100064100884554/" aria-label="Facebook"
+                 className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
+                  <FaFacebook className="w-4 h-4"/>
+              </a>
             <a href="#" aria-label="Instagram" className="hover:text-white transition">
               <Instagram className="w-4 h-4" />
             </a>
@@ -76,7 +77,7 @@ const Header = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className="text-2xl font-bold text-primary">Metalworks</span>
+              <span className="text-2xl font-bold text-primary">Corsican Engineering</span>
             </motion.div>
           </Link>
 

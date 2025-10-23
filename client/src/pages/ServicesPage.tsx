@@ -9,35 +9,25 @@ interface Service {
 
 const services: Service[] = [
   {
-    title: 'Custom Shelving Design',
-    description: 'We craft tailored shelving solutions to maximize your space and efficiency.',
+    title: 'Proiectare tehnică  personalizată',
+    description: 'Creăm soluții de proiectare precise și eficiente, adaptate cerințelor fiecărui proiect',
     image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+1',
   },
   {
-    title: 'Heavy-Duty Industrial Racks',
-    description: 'Durable, high-capacity racking systems built for the toughest environments.',
+    title: 'Execuție structuri metalice',
+    description: 'Realizăm structuri metalice durabile și precise, conform celor mai înalte standarde de calitate',
     image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+2',
   },
   {
-    title: 'Retail Display Fixtures',
-    description: 'Eye-catching metal displays that showcase your products in style.',
+    title: 'Montaj industrial',
+    description: 'Asigurăm montajul sigur și eficient al instalațiilor industriale și al ansamblurilor metalice',
     image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+3',
   },
   {
-    title: 'Custom Metal Fabrication',
-    description: 'Precision-cut and welded metal parts for bespoke projects.',
+    title: 'Service și reparații',
+    description: 'Oferim servicii profesionale de întreținere și reparații prin sudare, pentru prelungirea duratei de viață a echipamentelor',
     image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+4',
-  },
-  {
-    title: 'Installation & Assembly',
-    description: 'On-site installation by our expert technicians, done right the first time.',
-    image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+5',
-  },
-  {
-    title: 'Maintenance & Repair',
-    description: 'Keep your systems running smoothly with our scheduled maintenance packages.',
-    image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+6',
-  },
+  }
 ];
 
 const ServicesPage: React.FC = () => {
@@ -45,15 +35,14 @@ const ServicesPage: React.FC = () => {
     <main className="min-h-screen bg-gradient-to-br from-slate-100 to-white">
       {/* Banner - Using the new Banner component */}
       <Banner
-        title="Our Services"
-        subtitle="Discover our comprehensive range of metal fabrication services"
+        title="Serviciile noastre"
+        subtitle={'Descoperă performanța serviciilor Corsican. \nPentru noi – fiecare detaliu contează'}
         backgroundImage="/images/banners/services-banner.jpg"
         height="h-64"
       />
 
       {/* Services Grid */}
       <section className="py-16 px-6 md:px-12 max-w-6xl mx-auto">
-        <h2 className="text-3xl font-semibold text-center text-slate-800 mb-12">What We Offer</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map(({ title, description, image }) => (
             <div

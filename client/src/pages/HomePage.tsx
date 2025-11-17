@@ -5,26 +5,18 @@ import Banner from '../components/Banner';
 
 const HomePage = () => {
   const features = [
-    'Custom Metal Fabrication',
-    'CNC Machining',
-    'Welding Services',
-    'Metal Finishing',
-    'Quality Assurance',
-    'Expert Consultation',
+    'Instalații industriale de țeavă',
+    'Structuri metalice',
+    'Mobilier industrial',
+    'Servicii CNC',
+    'Servicii de reparații prin sudare'
   ];
-
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5 },
-  };
-
-  return (
+    return (
     <div className="min-h-screen">
       {/* Hero Section - Using the new Banner component */}
       <Banner
-        title="Precision Metal Fabrication"
-        subtitle="Crafting excellence in metal since 1995"
+        title="PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC"
+        subtitle="De la concept la montaj"
         backgroundImage="/images/banners/hero-bg.jpg"
         height="h-screen"
         backgroundColor="bg-gradient-to-r from-gray-900 to-gray-800"
@@ -33,7 +25,7 @@ const HomePage = () => {
           to="/contact"
           className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
         >
-          Get Started
+            Află mai multe
           <ArrowRight className="ml-2 h-5 w-5" />
         </Link>
       </Banner>
@@ -49,12 +41,8 @@ const HomePage = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Metalworks?
+                Oferim soluții complete, precise și durabile, adaptate cerințelor fiecărui proiect
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We combine cutting-edge technology with traditional craftsmanship to deliver
-              exceptional results.
-            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -88,15 +76,12 @@ const HomePage = () => {
             className="bg-blue-600 rounded-2xl overflow-hidden"
           >
             <div className="px-6 py-12 sm:px-12 lg:px-16 text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Project?</h2>
-              <p className="text-xl text-blue-100 mb-8">
-                Contact us today for a free consultation and quote.
-              </p>
+              <h2 className="text-3xl font-bold text-white mb-4">Hai să găsim soluții împreună</h2>
               <Link
                 to="/contact"
                 className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-200"
               >
-                Contact Us
+                  Contactează-ne
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </div>

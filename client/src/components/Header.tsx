@@ -1,166 +1,106 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Instagram, Linkedin } from 'lucide-react';
-import {FaFacebook} from "react-icons/fa";
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
+    const [isOpen, setIsOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const location = useLocation();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
-    };
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const navigation = [
+        { name: 'Acasă', href: '/' },
+        { name: 'Servicii', href: '/servicii' },
+        { name: 'Proiectele noastre', href: '/proiecte' },
+        { name: 'Clienți', href: '/clienti' },
+        { name: 'Contact', href: '/contact' },
+    ];
 
-  const navItems = [
-    { path: '/', label: 'Acasă' },
-    { path: '/services', label: 'Servicii' },
-    { path: '/products', label: 'Produse' },
-    { path: '/work', label: 'Proiectele noastre' },
-    { path: '/contact', label: 'Contact' },
-  ];
+    return (
+        <header
+            // Increased py-4 to py-6 for default, and py-2 to py-4 for scrolled state
+            className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+                scrolled ? 'bg-white shadow-md py-4' : 'bg-white/95 backdrop-blur-sm py-6'
+            }`}
+        >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center">
+                    <Link to="/" className="flex-shrink-0 flex items-center">
+                        {/* Increased text size from 2xl to 3xl */}
+                        <h1 className="text-3xl font-bold text-primary">
+                            Corsican Engineering
+                        </h1>
+                    </Link>
 
-  return (
-    <header
-      className={`fixed w-full z-50 top-0 left-0 right-0 transition-all duration-300 ${
-        isScrolled ? 'bg-background/95 backdrop-blur-sm shadow-md' : 'bg-transparent'
-      }`}
-    >
-      {/* Integrated Top Bar (always visible on sm+) */}
-      <div className="bg-slate-900 text-gray-300 text-xs hidden sm:block py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          {/* Left side: contact info */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <Phone className="w-3 h-3 mr-1" />
-              <span>+40 (768) 515 774</span>
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex space-x-8">
+                        {navigation.map((item) => (
+                            <Link
+                                key={item.name}
+                                to={item.href}
+                                // Increased text size from sm to base (16px)
+                                className={`text-base font-medium transition-colors duration-200 hover:text-primary ${
+                                    location.pathname === item.href
+                                        ? 'text-primary border-b-2 border-primary'
+                                        : 'text-gray-600'
+                                }`}
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    {/* Mobile menu button */}
+                    <div className="md:hidden flex items-center">
+                        <button
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="text-gray-600 hover:text-primary focus:outline-none"
+                        >
+                            {/* Increased icon size */}
+                            {isOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div className="flex items-center space-x-1">
-              <Phone className="w-3 h-3 mr-1" />
-              <span>+40 (768) 367 563</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Mail className="w-3 h-3 mr-1" />
-              <span>office@corsican.ro</span>
-            </div>
-          </div>
 
-          {/* Right side: social icons */}
-          <div className="flex items-center space-x-4">
-              <a href="https://www.facebook.com/p/Corsican-Engineering-100064100884554/" aria-label="Facebook"
-                 className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
-                  <FaFacebook className="w-4 h-4"/>
-              </a>
-            <a href="#" aria-label="Instagram" className="hover:text-white transition">
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a href="#" aria-label="LinkedIn" className="hover:text-white transition">
-              <Linkedin className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <span className="text-2xl font-bold text-primary">Corsican Engineering</span>
-            </motion.div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                  location.pathname === item.path
-                    ? 'text-secondary'
-                    : 'text-text hover:text-secondary'
-                }`}
-              >
-                {item.label}
-                {location.pathname === item.path && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary"
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
+            {/* Mobile Navigation */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="md:hidden bg-white border-t"
+                    >
+                        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                            {navigation.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    to={item.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`block px-3 py-2 rounded-md text-lg font-medium ${
+                                        location.pathname === item.href
+                                            ? 'text-primary bg-neutral-light'
+                                            : 'text-gray-600 hover:text-primary hover:bg-neutral-light'
+                                    }`}
+                                >
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
+                    </motion.div>
                 )}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-md text-text hover:text-secondary focus:outline-none"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isMobileMenuOpen ? (
-                <path d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="md:hidden bg-background shadow-lg overflow-hidden"
-          >
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    location.pathname === item.path
-                      ? 'bg-secondary/10 text-secondary'
-                      : 'text-text hover:bg-background-dark hover:text-secondary'
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
+            </AnimatePresence>
+        </header>
+    );
 };
 
 export default Header;

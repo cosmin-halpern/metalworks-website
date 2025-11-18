@@ -4,17 +4,21 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-background text-text min-h-screen;
-  font-family: 'Inter', sans-serif;
+@layer base {
+    body {
+        /* Changed bg-background to bg-white or bg-neutral-light */
+        /* Changed text-text to text-gray-900 or text-primary-dark */
+        @apply bg-white text-gray-900 min-h-screen;
+        font-family: 'Inter', sans-serif;
+    }
 }
 
 .hero-bg {
-  background-image: linear-gradient(
-    to right,
-    theme('colors.primary.DEFAULT'),
-    theme('colors.secondary.DEFAULT')
-  );
+    background-image: linear-gradient(
+            to right,
+            theme('colors.primary.DEFAULT'),
+            theme('colors.primary.light')
+    );
 }
 
 /* Custom utility classes */

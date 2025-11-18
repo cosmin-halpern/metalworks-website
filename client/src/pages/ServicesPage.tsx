@@ -1,63 +1,146 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import ServiceIcon from '../components/ServiceIcon';
+import ServiceGalleryModal from '../components/ServiceGalleryModal';
+import type { Service } from '../types';
 import Banner from '../components/Banner';
 
-interface Service {
-  title: string;
-  description: string;
-  image: string;
-}
-
+// 3 services only
 const services: Service[] = [
-  {
-    title: 'Proiectare tehnică  personalizată',
-    description: 'Creăm soluții de proiectare precise și eficiente, adaptate cerințelor fiecărui proiect',
-    image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+1',
-  },
-  {
-    title: 'Execuție structuri metalice',
-    description: 'Realizăm structuri metalice durabile și precise, conform celor mai înalte standarde de calitate',
-    image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+2',
-  },
-  {
-    title: 'Montaj industrial',
-    description: 'Asigurăm montajul sigur și eficient al instalațiilor industriale și al ansamblurilor metalice',
-    image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+3',
-  },
-  {
-    title: 'Service și reparații',
-    description: 'Oferim servicii profesionale de întreținere și reparații prin sudare, pentru prelungirea duratei de viață a echipamentelor',
-    image: 'https://placehold.co/300x200/eeeeee/333333?text=Service+4',
-  }
+    {
+        id: 'proiectare',
+        title: 'Proiectare',
+        description:
+            'Proiectare și consultanță pentru structuri și echipamente metalice, adaptate cerințelor fiecărui proiect.',
+        icon: 'proiectare'
+    },
+    {
+        id: 'executie',
+        title: 'Execuție',
+        description:
+            'Execuție și fabricație de componente și structuri metalice, cu accent pe precizie și calitate.',
+        icon: 'executie'
+    },
+    {
+        id: 'montaj',
+        title: 'Montaj',
+        description:
+            'Montaj și instalare la fața locului pentru sisteme și structuri metalice industriale.',
+        icon: 'montaj'
+    }
 ];
 
-const ServicesPage: React.FC = () => {
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-100 to-white">
-      {/* Banner - Using the new Banner component */}
-      <Banner
-        title="Serviciile noastre"
-        subtitle={'Descoperă performanța serviciilor Corsican. \nPentru noi – fiecare detaliu contează'}
-        backgroundImage="/images/banners/services-banner.jpg"
-        height="h-64"
-      />
+// galleries for each service – you can add more images here
+const serviceGalleries: Record<string, string[]> = {
+    proiectare: [
+        '/images/servicesImagesGaleries/proiectare/proiectare1.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare2.png',
+        '/images/servicesImagesGaleries/proiectare/proiectare3.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare4.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare5.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare6.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare7.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare8.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare9.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare10.jpg',
+        '/images/servicesImagesGaleries/proiectare/proiectare11.jpg'
+    ],
+    executie: [
+        '/images/servicesImagesGaleries/executie/executie1.jpg',
+        '/images/servicesImagesGaleries/executie/executie2.jpg',
+        '/images/servicesImagesGaleries/executie/executie3.jpg',
+        '/images/servicesImagesGaleries/executie/executie4.jpg',
+        '/images/servicesImagesGaleries/executie/executie5.jpg',
+        '/images/servicesImagesGaleries/executie/executie6.jpg',
+        '/images/servicesImagesGaleries/executie/executie7.jpg',
+        '/images/servicesImagesGaleries/executie/executie8.jpg',
+        '/images/servicesImagesGaleries/executie/executie9.jpg',
+        '/images/servicesImagesGaleries/executie/executie10.jpg',
+        '/images/servicesImagesGaleries/executie/executie11.jpg',
+        '/images/servicesImagesGaleries/executie/executie12.jpg',
+        '/images/servicesImagesGaleries/executie/executie13.jpg'
+    ],
+    montaj: [
+        '/images/servicesImagesGaleries/montaj/montaj1.jpg',
+        '/images/servicesImagesGaleries/montaj/montaj2.jpg',
+        '/images/servicesImagesGaleries/montaj/montaj3.jpg',
+        '/images/servicesImagesGaleries/montaj/montaj4.jpg',
+        '/images/servicesImagesGaleries/montaj/montaj5.jpg',
+        '/images/servicesImagesGaleries/montaj/montaj6.jpg'
+    ]
+};
 
-      {/* Services Grid */}
-      <section className="py-16 px-6 md:px-12 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map(({ title, description, image }) => (
-            <div
-              key={title}
-              className="bg-white/80 backdrop-blur-sm rounded-xl shadow p-6 flex flex-col items-center text-center hover:shadow-lg transition"
-            >
-              <img src={image} alt={title} className="w-full h-40 object-cover rounded-md mb-4" />
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">{title}</h3>
-              <p className="text-gray-600">{description}</p>
-            </div>
-          ))}
+const ServicesPage: React.FC = () => {
+    const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+
+    const selectedService = services.find((s) => s.id === selectedServiceId);
+
+    return (
+        <div className="min-h-screen bg-white">
+            {/* Page Banner */}
+            <Banner
+                title="Serviciile noastre"
+                subtitle="Proiectare, execuție și montaj pentru structuri și echipamente metalice"
+                backgroundImage="/images/banners/services-banner.png"
+                height="h-72 md:h-80"
+                backgroundColor="bg-primary-dark"
+            />
+
+            {/* Services Section */}
+            <section className="py-20 md:py-28">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center mb-20"
+                    >
+                        <p className="text-gray-600 font-semibold text-lg max-w-2xl mx-auto">
+                            Oferim servicii complete de proiectare, execuție și montaj pentru structuri și echipamente metalice.
+                        </p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        {services.map((service, index) => (
+                            <motion.div
+                                key={service.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: index * 0.05 }}
+                                className="bg-neutral-light rounded-2xl p-12 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-200 min-h-[400px]"
+                            >
+                                <ServiceIcon iconKey={service.icon} className="h-20 w-20 mb-8" />
+
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                                    {service.title}
+                                </h2>
+                                <p className="text-base text-gray-600 mb-8 flex-1 leading-relaxed">
+                                    {service.description}
+                                </p>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedServiceId(service.id)}
+                                    className="inline-flex items-center px-6 py-2.5 text-sm font-medium text-primary hover:text-primary-dark border border-primary hover:border-primary-dark rounded-lg transition-colors"
+                                >
+                                    Vezi galerie
+                                </button>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Gallery Modal */}
+            <ServiceGalleryModal
+                open={!!selectedService}
+                onClose={() => setSelectedServiceId(null)}
+                serviceTitle={selectedService?.title ?? ''}
+                images={selectedService ? serviceGalleries[selectedService.id] ?? [] : []}
+            />
         </div>
-      </section>
-    </main>
-  );
+    );
 };
 
 export default ServicesPage;

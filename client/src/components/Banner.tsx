@@ -16,10 +16,10 @@ const Banner: React.FC<BannerProps> = ({
                                            backgroundImage,
                                            height = 'h-96',
                                            children,
-                                           backgroundColor = 'bg-primary-dark', // Changed default
+                                           backgroundColor = 'bg-primary-dark',
                                        }) => {
     return (
-        <div className={`relative w-full ${height} overflow-hidden ${backgroundColor}`}>
+        <div className={`relative w-full ${height} overflow-hidden ${backgroundColor} font-sans`}>
             {/* Background Image */}
             {backgroundImage && (
                 <div className="absolute inset-0 w-full h-full">
@@ -37,7 +37,8 @@ const Banner: React.FC<BannerProps> = ({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 max-w-4xl"
+                    // Reduced sizes: text-3xl -> text-2xl, sm:text-4xl -> sm:text-3xl, etc.
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 max-w-4xl uppercase tracking-wider"
                 >
                     {title}
                 </motion.h1>
@@ -47,7 +48,8 @@ const Banner: React.FC<BannerProps> = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-lg sm:text-xl text-gray-200 max-w-2xl mb-8"
+                        // Reduced sizes: text-lg -> text-base, sm:text-xl -> sm:text-lg
+                        className="text-base sm:text-lg text-gray-200 max-w-2xl mb-8 font-light tracking-wide"
                     >
                         {subtitle}
                     </motion.p>

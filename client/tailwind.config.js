@@ -6,11 +6,13 @@ export default {
     ],
     theme: {
         extend: {
+            fontFamily: {
+                // Set Oswald as the default sans font
+                sans: ['Oswald', 'sans-serif'],
+            },
             colors: {
-                // Add these aliases mapping to your palette
-                background: '#ffffff', // or '#f4f4f4'
-                text: '#1a3d64',       // or '#0c2b4e'
-
+                background: '#ffffff',
+                text: '#1a3d64',
                 primary: {
                     DEFAULT: '#1a3d64',
                     dark: '#0c2b4e',

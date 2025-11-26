@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Phone, Mail, MapPin, Instagram, Linkedin } from 'lucide-react';
 import { FaFacebook } from 'react-icons/fa';
 
 const Footer = () => {

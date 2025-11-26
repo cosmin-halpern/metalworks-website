@@ -9,9 +9,9 @@ type CarouselSlide = {
 
 type CarouselBannerProps = {
     slides: CarouselSlide[];
-    height?: string; // e.g. "h-screen" or "h-[70vh]"
+    height?: string;
     autoPlayIntervalMs?: number;
-    cta?: ReactNode; // optional button/link rendered under subtitle
+    cta?: ReactNode;
 };
 
 const CarouselBanner: React.FC<CarouselBannerProps> = ({
@@ -35,37 +35,39 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
     const currentSlide = slides[currentIndex];
 
     return (
-        // Changed bg-black to bg-primary-dark
-        <section className={`relative w-full ${height} overflow-hidden bg-primary-dark`}>
+        <section className={`relative w-full ${height} overflow-hidden bg-primary-dark font-sans`}>
             {/* Background images */}
             <div className="absolute inset-0">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentSlide.image}
-                        initial={{ opacity: 0, scale: 1.02 }}
+                        initial={{ opacity: 0, scale: 1.05 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        transition={{ duration: 0.8 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 1.2 }}
                         className="absolute inset-0"
                     >
                         <div
                             className="w-full h-full bg-center bg-cover"
                             style={{ backgroundImage: `url(${currentSlide.image})` }}
                         />
-                        <div className="absolute inset-0 bg-black/50" />
+                        <div className="absolute inset-0 bg-black/40" />
                     </motion.div>
                 </AnimatePresence>
             </div>
 
             {/* Content */}
             <div className="relative z-10 max-w-7xl mx-auto h-full flex items-center px-4 sm:px-6 lg:px-8">
-                <div className="max-w-2xl">
+                <div className="max-w-4xl">
                     <motion.h1
                         key={currentSlide.title}
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight"
+                        // Removed 'leading-tight'/'leading-normal' class
+                        // Added explicit style={{ lineHeight: 1.4 }} to force the fix
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 uppercase tracking-tight"
+                        style={{ lineHeight: 1.4 }}
                     >
                         {currentSlide.title}
                     </motion.h1>
@@ -76,7 +78,7 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.15 }}
-                            className="text-lg md:text-xl text-gray-100 mb-6"
+                            className="text-xl md:text-2xl text-gray-100 mb-8 font-light tracking-wide uppercase"
                         >
                             {currentSlide.subtitle}
                         </motion.p>
@@ -95,14 +97,14 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
             </div>
 
             {/* Dots */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
                 {slides.map((_, index) => (
                     <button
                         key={index}
                         type="button"
                         onClick={() => setCurrentIndex(index)}
-                        className={`h-2 w-2 rounded-full transition-all ${
-                            index === currentIndex ? 'bg-white w-6' : 'bg-white/50'
+                        className={`h-1.5 transition-all duration-300 ${
+                            index === currentIndex ? 'bg-white w-8' : 'bg-white/40 w-4 hover:bg-white/60'
                         }`}
                         aria-label={`Go to slide ${index + 1}`}
                     />

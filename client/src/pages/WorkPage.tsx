@@ -234,6 +234,21 @@ const WorkPage: React.FC = () => {
             {/* Projects Section */}
             <section className="py-16 md:py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Added Intro Text Block */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 uppercase tracking-wide font-sans">
+                            Descoperă portofoliul nostru
+                        </h2>
+                        <p className="text-gray-600 max-w-2xl mx-auto text-lg font-medium font-sans">
+                            Mai jos îți oferim detalii despre câteva dintre proiectele noastre
+                        </p>
+                    </motion.div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {projects.map((project, index) => (
                             <motion.div
@@ -251,17 +266,19 @@ const WorkPage: React.FC = () => {
                                         className="h-full w-full object-cover"
                                     />
                                 </div>
-                                <div className="p-6 flex-1 flex flex-col">
-                                    <h2 className="text-lg font-semibold text-gray-900">
+                                {/* Updated container flex properties to align center */}
+                                <div className="p-6 flex-1 flex flex-col items-center text-center">
+                                    <h2 className="text-lg font-bold text-gray-900 font-sans uppercase">
                                         {project.title}
                                     </h2>
-                                    <p className="mt-2 text-sm text-gray-600 flex-1">
+                                    <p className="mt-2 text-sm text-gray-600 flex-1 font-sans">
                                         {project.description}
                                     </p>
+                                    {/* Updated button styling to match ServicesPage */}
                                     <button
                                         type="button"
                                         onClick={() => setSelectedProjectId(project.id)}
-                                        className="mt-4 inline-flex items-center text-sm font-medium text-primary hover:text-primary-dark"
+                                        className="mt-6 inline-flex items-center px-6 py-2.5 text-sm font-medium text-primary hover:text-primary-dark border border-primary hover:border-primary-dark rounded-lg transition-colors font-sans uppercase tracking-wide"
                                     >
                                         Vezi galeria
                                     </button>

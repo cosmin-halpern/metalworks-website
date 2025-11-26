@@ -31,7 +31,7 @@ const ClientsPage: React.FC = () => {
             <Banner
                 title="Clienții noștri"
                 subtitle="Suntem mândri să colaborăm cu companii de renume din industrie"
-                backgroundImage="/images/banners/services-banner.png"
+                backgroundImage="/images/banners/banner01.webp"
                 height="h-72 md:h-80"
                 backgroundColor="bg-primary-dark"
             />
@@ -44,7 +44,8 @@ const ClientsPage: React.FC = () => {
                         transition={{ duration: 0.5 }}
                         className="text-center mb-16"
                     >
-                        <p className="text-gray-600 max-w-2xl mx-auto">
+                        {/* APPLIED STANDARD CLASS */}
+                        <p className="text-gray-600 max-w-2xl mx-auto text-lg font-medium font-sans">
                             De-a lungul anilor am construit parteneriate solide cu companii din diverse sectoare industriale.
                         </p>
                     </motion.div>

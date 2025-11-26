@@ -81,7 +81,7 @@ const ServicesPage: React.FC = () => {
             <Banner
                 title="Serviciile noastre"
                 subtitle="Proiectare, execuție și montaj pentru structuri și echipamente metalice"
-                backgroundImage="/images/banners/services-banner.png"
+                backgroundImage="/images/banners/banner01.webp"
                 height="h-72 md:h-80"
                 backgroundColor="bg-primary-dark"
             />
@@ -95,7 +95,8 @@ const ServicesPage: React.FC = () => {
                         transition={{ duration: 0.5 }}
                         className="text-center mb-20"
                     >
-                        <p className="text-gray-600 font-semibold text-lg max-w-2xl mx-auto">
+                        {/* UPDATED CLASS: removed 'font-semibold text-lg', added 'text-gray-600 max-w-2xl mx-auto' to match ClientsPage */}
+                        <p className="text-gray-600 max-w-2xl mx-auto text-lg font-medium font-sans">
                             Oferim servicii complete de proiectare, execuție și montaj pentru structuri și echipamente metalice.
                         </p>
                     </motion.div>

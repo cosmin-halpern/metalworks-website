@@ -75,7 +75,6 @@ const HomePage = () => {
                     cta={
                         <Link
                             to="/contact"
-                            // Updated button color
                             className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark transition-colors duration-200 mt-6"
                         >
                             Află mai multe
@@ -100,7 +99,8 @@ const HomePage = () => {
                         </h2>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {/* Changed from Grid to Flex for centered alignment */}
+                    <div className="flex flex-wrap justify-center gap-8">
                         {features.map((feature, index) => (
                             <motion.div
                                 key={feature}
@@ -108,12 +108,11 @@ const HomePage = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                                // Changed bg-gray-50 to bg-neutral-light
-                                className="bg-neutral-light rounded-lg p-6 hover:shadow-lg transition-shadow duration-200"
+                                // Using flex-basis to size items roughly like columns but allowing centering
+                                className="bg-neutral-light rounded-lg p-6 hover:shadow-lg transition-shadow duration-200 w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)]"
                             >
-                                <div className="flex items-center space-x-3">
-                                    {/* Changed text-blue-600 to text-primary */}
-                                    <CheckCircle className="h-6 w-6 text-primary" />
+                                <div className="flex items-center space-x-3 h-full">
+                                    <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
                                     <h3 className="text-xl font-semibold text-gray-900">{feature}</h3>
                                 </div>
                             </motion.div>
@@ -133,7 +132,6 @@ const HomePage = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.5 }}
-                        // Changed bg-blue-600 to bg-primary
                         className="bg-primary rounded-2xl overflow-hidden"
                     >
                         <div className="px-6 py-12 sm:px-12 lg:px-16 text-center">
@@ -142,7 +140,6 @@ const HomePage = () => {
                             </h2>
                             <Link
                                 to="/contact"
-                                // Updated button color (text-blue-600 -> text-primary, hover:bg-blue-50 -> hover:bg-neutral-light)
                                 className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-neutral-light transition-colors duration-200"
                             >
                                 Contactează-ne

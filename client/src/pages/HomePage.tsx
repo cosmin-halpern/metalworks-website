@@ -17,30 +17,31 @@ const HomePage = () => {
         {
             image: '/images/homePageBanners/home1.jpg',
             title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la montaj'
+            subtitle: 'De la concept la soluția finală'
         },
         {
             image: '/images/homePageBanners/home2.jpg',
             title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la montaj'
+            subtitle: 'De la concept la soluția finală'
         },
         {
             image: '/images/homePageBanners/home3.jpg',
             title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la montaj'
+            subtitle: 'De la concept la soluția finală'
         },
         {
             image: '/images/homePageBanners/home4.jpg',
             title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la montaj'
+            subtitle: 'De la concept la soluția finală'
         },
         {
             image: '/images/homePageBanners/home5.jpg',
             title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la montaj'
+            subtitle: 'De la concept la soluția finală'
         }
     ];
 
+    // @ts-ignore
     const clientLogos = [
         '/images/sigleClienti/sigla1.jpg',
         '/images/sigleClienti/sigla2.png',
@@ -122,7 +123,7 @@ const HomePage = () => {
             </section>
 
             {/* Client Logos Carousel */}
-            <ClientLogosCarousel logos={clientLogos} speed={40} />
+            <ClientLogosCarousel />
 
             {/* CTA Section */}
             <section className="py-20 bg-neutral-light">

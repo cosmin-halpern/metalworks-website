@@ -1,55 +1,60 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { z } from 'zod';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import contactRouter from './routes/contact';
+import path from 'path';
+import fs from 'fs';
 
-// Load environment variables
+// Import routes
+import authRoutes from './routes/auth.js';
+import projectRoutes from './routes/projects.js';
+import clientRoutes from './routes/clients.js';
+import dotenv from "dotenv";
+import {fileURLToPath} from "url";
+
 dotenv.config();
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Fix for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(helmet());
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
 
-// Validation schemas
-const contactFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().optional(),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-  service: z.string().optional(),
-});
+// Serve Static Images
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)){
+    fs.mkdirSync(uploadsDir);
+}
+app.use('/uploads', express.static(uploadsDir));
 
-// Error handling middleware
-const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: 'error',
-    message: 'Internal server error',
-  });
+// Database Connection
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MONGO_URI as string);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error: any) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
+    }
 };
 
-// Routes
-app.use('/api/contact', contactRouter);
+// Define Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/clients', clientRoutes);
 
-// Apply error handling middleware
-app.use(errorHandler);
+// Default Route
+app.get('/', (req, res) => {
+    res.send('Metalworks API is running...');
+});
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Start Server
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
 });

@@ -1,301 +1,129 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import ProjectGalleryModal from '../components/ProjectGalleryModal';
 import Banner from '../components/Banner';
+import ProjectGalleryModal from '../components/ProjectGalleryModal';
 
+// This must match exactly what your backend returns and what ProjectGalleryModal expects
 type ProjectMedia = {
     type: 'image' | 'video';
     src: string;
 };
 
 type Project = {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     coverImage: string;
     media: ProjectMedia[];
 };
 
-const projects: Project[] = [
-    {
-        id: 'rafturi-industriale',
-        title: 'Rafturi industriale',
-        description: 'Soluții robuste de depozitare pentru spații industriale.',
-        coverImage: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi7.jpg',
-        media: [
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi1.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi2.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi3.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi4.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi5.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi6.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi7.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi8.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi9.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi10.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi11.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi12.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi13.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi14.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/rafturi15.jpg' },
-            { type: 'video', src: '/images/imaginiProiecteleNoastre/imaginiRafturiIndustriale/VideoRafturi1.mp4' }
-        ]
-    },
-    {
-        id: 'structuri-metalice',
-        title: 'Structuri metalice',
-        description: 'Structuri metalice pentru hale, platforme și alte aplicații.',
-        coverImage: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri1.jpg',
-        media: [
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri1.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri2.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri3.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri4.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri5.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri6.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri7.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri8.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri9.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri10.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri11.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri12.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri13.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri14.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri15.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri16.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri17.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri18.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri19.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri20.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri21.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri22.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri23.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri24.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri25.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri26.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri27.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri28.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri29.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri30.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri31.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri32.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri33.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri34.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri35.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri36.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri37.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri38.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri39.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri40.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiStructuriMetalice/structuri41.jpg' }
-        ]
-    },
-    {
-        id: 'instalatii-teava',
-        title: 'Instalații de țeavă',
-        description: 'Instalații industriale de țeavă pentru diverse aplicații.',
-        coverImage: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii1.jpg',
-        media: [
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii1.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii2.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii3.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii4.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii5.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii6.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii7.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii8.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii9.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii10.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii11.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii12.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii13.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii14.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii15.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii16.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii17.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii18.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii19.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii20.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiInstalatiiTeava/instalatii21.jpg' }
-        ]
-    },
-    {
-        id: 'protectii-inox',
-        title: 'Protecții inox',
-        description: 'Protecții și finisaje din inox pentru medii exigente.',
-        coverImage: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii1.jpg',
-        media: [
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii1.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii2.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii3.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii4.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii5.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii6.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii7.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii8.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii9.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii10.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii11.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii12.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii13.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii14.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii15.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii16.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii17.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii18.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii19.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii20.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii21.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii22.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii23.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii24.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii25.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii26.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii27.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii28.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii29.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiProtectiiInox/protectii30.jpg' }
-        ]
-    },
-    {
-        id: 'terase-mobilier-horeca',
-        title: 'Terase & mobilier HoReCa',
-        description: 'Structuri și mobilier metalic pentru terase și spații HoReCa.',
-        coverImage: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase1.jpg',
-        media: [
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase1.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase2.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase3.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase4.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase5.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase6.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase7.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase8.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase9.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase10.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase11.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase12.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase13.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase14.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase15.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase16.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase17.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase18.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase19.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase20.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase21.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase22.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase23.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase24.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase25.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase26.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase27.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase28.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase29.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase30.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase31.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase32.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiTeraseMobilierHoreca/terase33.jpg' }
-        ]
-    },
-    {
-        id: 'carucioare-marfa',
-        title: 'Cărucioare marfă',
-        description: 'Cărucioare personalizate pentru manipularea mărfurilor.',
-        coverImage: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare1.jpg',
-        media: [
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare1.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare2.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare3.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare4.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare5.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare6.jpg' },
-            { type: 'image', src: '/images/imaginiProiecteleNoastre/imaginiCarucioareMarfa/carucioare7.jpg' },
-        ]
+const WorkPage = () => {
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // @ts-ignore
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const SERVER_URL = 'http://localhost:5001';
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/projects`);
+                const data = await res.json();
+                setProjects(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error('Failed to load projects:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProjects();
+    }, [API_BASE]);
+
+    const handleOpenGallery = (project: Project) => {
+        setSelectedProject(project);
+        setIsModalOpen(true);
+    };
+
+    const getFullUrl = (path: string) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${SERVER_URL}${path}`;
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-900"></div>
+            </div>
+        );
     }
-];
-
-const WorkPage: React.FC = () => {
-    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-
-    const selectedProject = projects.find((p) => p.id === selectedProjectId);
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Page Banner */}
             <Banner
-                title="Proiectele noastre"
-                subtitle="O selecție de lucrări realizate pentru clienții noștri"
+                title="Proiectele Noastre"
+                subtitle="O selecție a celor mai reprezentative lucrări din portofoliul Corsican Engineering"
                 backgroundImage="/images/banners/services-banner.png"
-                height="h-72 md:h-80"
-                backgroundColor="bg-primary-dark"
             />
 
-            {/* Projects Section */}
-            <section className="py-16 md:py-20">
+            <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Added Intro Text Block */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center mb-16"
-                    >
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 uppercase tracking-wide font-sans">
-                            Descoperă portofoliul nostru
-                        </h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto text-lg font-medium font-sans">
-                            Mai jos îți oferim detalii despre câteva dintre proiectele noastre
-                        </p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {projects.map((project, index) => (
                             <motion.div
-                                key={project.id}
+                                key={project._id}
                                 initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: index * 0.05 }}
-                                className="bg-neutral-light rounded-xl overflow-hidden flex flex-col"
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col"
                             >
-                                <div className="aspect-video bg-gray-200">
+                                <div className="relative aspect-[4/3] overflow-hidden">
                                     <img
-                                        src={project.coverImage}
+                                        src={getFullUrl(project.coverImage)}
                                         alt={project.title}
-                                        className="h-full w-full object-cover"
+                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                                     />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <button
+                                            onClick={() => handleOpenGallery(project)}
+                                            className="bg-white text-gray-900 px-6 py-2 rounded-full font-bold shadow-lg"
+                                        >
+                                            Vezi Galerie
+                                        </button>
+                                    </div>
                                 </div>
-                                {/* Updated container flex properties to align center */}
-                                <div className="p-6 flex-1 flex flex-col items-center text-center">
-                                    <h2 className="text-lg font-bold text-gray-900 font-sans uppercase">
-                                        {project.title}
-                                    </h2>
-                                    <p className="mt-2 text-sm text-gray-600 flex-1 font-sans">
-                                        {project.description}
-                                    </p>
-                                    {/* Updated button styling to match ServicesPage */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectedProjectId(project.id)}
-                                        className="mt-6 inline-flex items-center px-6 py-2.5 text-sm font-medium text-primary hover:text-primary-dark border border-primary hover:border-primary-dark rounded-lg transition-colors font-sans uppercase tracking-wide"
-                                    >
-                                        Vezi galeria
-                                    </button>
+
+                                <div className="p-6 flex-1">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                                    <p className="text-gray-600 line-clamp-3 text-sm">{project.description}</p>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
+
+                    {projects.length === 0 && (
+                        <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                            <p className="text-gray-500 font-medium">Momentan nu există proiecte încărcate.</p>
+                            <p className="text-sm text-gray-400 mt-1">Accesați panoul de administrare pentru a adăuga proiecte noi.</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
-            {/* Gallery Modal */}
-            <ProjectGalleryModal
-                open={!!selectedProject}
-                onClose={() => setSelectedProjectId(null)}
-                projectTitle={selectedProject?.title ?? ''}
-                media={selectedProject?.media ?? []}
-            />
+            {selectedProject && (
+                <ProjectGalleryModal
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    projectTitle={selectedProject.title}
+                    media={selectedProject.media.map(m => ({
+                        type: m.type,
+                        src: getFullUrl(m.src)
+                    }))}
+                />
+            )}
         </div>
     );
 };

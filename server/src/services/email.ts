@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { EmailConfig, EmailData } from '../types';
+import { EmailConfig, EmailData } from '../types/index.js';
 
 // Create reusable transporter
 const createTransporter = (): nodemailer.Transporter => {

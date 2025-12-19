@@ -16,24 +16,14 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: function(origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5173',
-            'https://test.corsican.ro',
-            'https://corsican.ro',
-            'https://www.corsican.ro'
-        ];
-        // Allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
-        }
-        return callback(null, true);
-    },
+    origin: true, // This allows any origin that makes the request - best for debugging CORS
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
+
+// Handle pre-flight (OPTIONS) requests explicitly
+app.options('*', cors());
 
 const PORT = process.env.PORT || 5000;
 

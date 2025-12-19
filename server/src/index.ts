@@ -16,14 +16,16 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: 'https://test.corsican.ro', // This allows any origin that makes the request - best for debugging CORS
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+    origin: 'https://test.corsican.ro',
+    credentials: true
 }));
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'API is responding' });
+});
+
+app.get('/api/verify', (req, res) => {
+    res.json({ msg: 'Server is reachable and running Node 20' });
 });
 
 // Handle pre-flight (OPTIONS) requests explicitly

@@ -14,6 +14,7 @@ const getBaseUrl = () => {
 
 const BASE_URL = getBaseUrl();
 export const API_URL = `${BASE_URL}/api`;
+export const SERVER_URL = BASE_URL;
 
 export const authService = {
     setToken(token: string) {

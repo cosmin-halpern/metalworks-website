@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../../services/authService';
+import {API_URL, authService} from '../../services/authService';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -9,13 +9,11 @@ const Login = () => {
     const navigate = useNavigate();
 
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
-            const res = await fetch(`${API_BASE}/auth/login`, {
+            const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),

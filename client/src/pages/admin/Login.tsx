@@ -8,6 +8,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -26,10 +27,12 @@ const Login = () => {
                 authService.setUser(data.user);
                 navigate('/admin');
             } else {
-                setError(data.msg || 'Login failed');
+                setError(data.msg || 'Email sau parolă incorectă');
             }
         } catch (err) {
-            setError('Server error. Please check if backend is running on port 5001.');
+            // This is the real error handler
+            setError('Nu s-a putut contacta serverul. Verificați conexiunea la internet sau dacă API-ul este pornit.');
+            console.error('Login Error:', err);
         }
     };
 

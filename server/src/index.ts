@@ -14,24 +14,33 @@ import {fileURLToPath} from "url";
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+    origin: function(origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'https://test.corsican.ro',
+            'https://corsican.ro',
+            'https://www.corsican.ro'
+        ];
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+}));
+
 const PORT = process.env.PORT || 5000;
 
 // Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
-app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://test.corsican.ro',
-        'https://corsican.ro',
-        'https://www.corsican.ro'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
-}));
 app.use(express.json());
 
 // Serve Static Images

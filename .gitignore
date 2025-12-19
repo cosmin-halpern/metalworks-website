@@ -19,7 +19,10 @@ client/.env
 
 # Build Outputs
 # We ignore the React build because we upload it manually to public_html
-client/dist/
+#client/dist/
+
+!client/dist/
+!server/dist/
 
 # WE DO NOT IGNORE server/dist/
 # cPanel needs the compiled JavaScript files to run the backend!

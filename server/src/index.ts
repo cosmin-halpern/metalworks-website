@@ -22,6 +22,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
 
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'API is responding' });
+});
+
 // Handle pre-flight (OPTIONS) requests explicitly
 app.options('*', cors());
 

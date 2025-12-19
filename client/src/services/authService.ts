@@ -1,8 +1,15 @@
 const getBaseUrl = () => {
     const host = window.location.hostname;
-    if (host === 'localhost') return 'http://localhost:5001';
-    if (host === 'test.corsican.ro') return 'https://api-test.corsican.ro';
-    return 'https://api.corsican.ro'; // Production
+    // If we are developing locally
+    if (host === 'localhost' || host === '127.0.0.1') {
+        return 'http://localhost:5001';
+    }
+    // If we are on the test server
+    if (host === 'test.corsican.ro') {
+        return 'https://api-test.corsican.ro';
+    }
+    // Production
+    return 'https://api.corsican.ro';
 };
 
 const BASE_URL = getBaseUrl();

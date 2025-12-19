@@ -1,27 +1,26 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
 # Logs
-logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-client/dist
-server/dist/__tests__
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS Files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.idea/
+.vscode/
+
+# Environment Variables (IMPORTANT: Never push these)
+.env
 server/.env
-client/node_modules
+client/.env
+
+# Build Outputs
+# We ignore the React build because we upload it manually to public_html
+client/dist/
+
+# WE DO NOT IGNORE server/dist/
+# cPanel needs the compiled JavaScript files to run the backend!
+# server/dist  <-- KEEP THIS COMMENTED OUT OR REMOVED

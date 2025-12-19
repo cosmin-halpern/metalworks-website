@@ -1,6 +1,7 @@
-// cPanel Bridge Loader
-// Use the absolute path to your home directory
-import('/home/corsican/repositories/metalworks-website/server/dist/index.js').catch(err => {
-    console.error('Startup Error:', err);
-
+/**
+ * cPanel Bridge
+ * This file stays in the root of the server folder and launches the compiled code.
+ */
+import('./dist/index.js').catch(err => {
+    console.error('Failed to load server from dist:', err);
 });

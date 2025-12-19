@@ -3,73 +3,64 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import dotenv from "dotenv";
 
 // Import routes
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import clientRoutes from './routes/clients.js';
-import dotenv from "dotenv";
-import {fileURLToPath} from "url";
 
 dotenv.config();
 
 const app = express();
 
+// 1. Dynamic Port for cPanel (Passenger uses a pipe string)
+const PORT = process.env.PORT || 5000;
+
+// 2. Comprehensive CORS for testing
 app.use(cors({
-    origin: 'https://test.corsican.ro',
-    credentials: true
+    origin: ['https://test.corsican.ro', 'http://localhost:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
 
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'API is responding' });
-});
-
-app.get('/api/verify', (req, res) => {
-    res.json({ msg: 'Server is reachable and running Node 20' });
-});
-
-// Handle pre-flight (OPTIONS) requests explicitly
-app.options('*', cors());
-
-const PORT = process.env.PORT || 5000;
+app.use(express.json());
 
 // Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.json());
+// 3. Health Check Routes (for debugging cPanel)
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', node: process.version });
+});
 
-// Serve Static Images
+// 4. Serve Static Images
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)){
-    fs.mkdirSync(uploadsDir);
+    fs.mkdirSync(uploadsDir, { recursive: true });
 }
 app.use('/uploads', express.static(uploadsDir));
-
-// Database Connection
-const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGO_URI as string);
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error: any) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
-    }
-};
 
 // Define Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/clients', clientRoutes);
 
-// Default Route
 app.get('/', (req, res) => {
     res.send('Metalworks API is running...');
 });
 
-// Start Server
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+// 5. Start Server First (Prevents 504 Timeout)
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
+
+// 6. Connect DB in background
+if (process.env.MONGO_URI) {
+    mongoose.connect(process.env.MONGO_URI as string)
+        .then(() => console.log('MongoDB Connected'))
+        .catch(err => console.error('MongoDB Connection Error:', err));
+}

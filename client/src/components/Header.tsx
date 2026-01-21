@@ -35,7 +35,7 @@ const Header = () => {
                     <Link to="/" className="flex-shrink-0 flex items-center gap-3">
                         {/* Added Logo Image */}
                         <img
-                            src="/logo-bad.jpeg"
+                            src="/logo.jpeg"
                             alt="Corsican Engineering Logo"
                             className={`transition-all duration-300 ${scrolled ? 'h-12' : 'h-16'} w-auto object-contain`}
                         />

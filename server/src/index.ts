@@ -10,6 +10,9 @@ import dotenv from "dotenv";
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import clientRoutes from './routes/clients.js';
+import productRoutes from './routes/products.js';
+import settingsRoutes from './routes/settings.js';
+import ordersRoutes from './routes/orders.js';
 
 dotenv.config();
 
@@ -19,12 +22,28 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // 2. Comprehensive CORS for testing
+const allowedOrigins = new Set([
+    'https://test.corsican.ro',
+    'http://localhost:5173',
+    'http://localhost:3000',
+]);
+
 app.use(cors({
-    origin: ['https://test.corsican.ro', 'http://localhost:5173'],
+    origin: (origin, callback) => {
+        // allow requests like curl/postman (no Origin header)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.has(origin)) return callback(null, true);
+
+        // block everything else
+        return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
 }));
+
+app.options('*', cors());
 
 app.use(express.json());
 
@@ -48,6 +67,9 @@ app.use('/uploads', express.static(uploadsDir));
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/clients', clientRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/orders', ordersRoutes);
 
 app.get('/', (req, res) => {
     res.send('Metalworks API is running...');

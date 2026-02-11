@@ -30,12 +30,8 @@ const allowedOrigins = new Set([
 
 app.use(cors({
     origin: (origin, callback) => {
-        // allow requests like curl/postman (no Origin header)
         if (!origin) return callback(null, true);
-
         if (allowedOrigins.has(origin)) return callback(null, true);
-
-        // block everything else
         return callback(new Error(`CORS blocked for origin: ${origin}`), false);
     },
     credentials: true,
@@ -63,7 +59,7 @@ if (!fs.existsSync(uploadsDir)){
 }
 app.use('/uploads', express.static(uploadsDir));
 
-// Define Routes
+// Define Routes (API)
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/clients', clientRoutes);
@@ -71,8 +67,13 @@ app.use('/api/products', productRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/orders', ordersRoutes);
 
-app.get('/', (req, res) => {
-    res.send('Metalworks API is running...');
+// Serve React build (client/dist)
+const clientDistPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+
+// SPA fallback (React Router) - keep AFTER /api routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
 // 5. Start Server First (Prevents 504 Timeout)

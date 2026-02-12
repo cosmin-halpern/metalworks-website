@@ -24,12 +24,10 @@ const allowedOrigins = new Set([
 ]);
 app.use(cors({
     origin: (origin, callback) => {
-        // allow requests like curl/postman (no Origin header)
         if (!origin)
             return callback(null, true);
         if (allowedOrigins.has(origin))
             return callback(null, true);
-        // block everything else
         return callback(new Error(`CORS blocked for origin: ${origin}`), false);
     },
     credentials: true,
@@ -51,15 +49,33 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 app.use('/uploads', express.static(uploadsDir));
-// Define Routes
+// Define Routes (API)
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/orders', ordersRoutes);
-app.get('/', (req, res) => {
-    res.send('Metalworks API is running...');
+// Serve React build (client/dist)
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+const clientIndexHtml = path.join(clientDistPath, 'index.html');
+app.use(express.static(clientDistPath, {
+    index: false,
+}));
+// SPA fallback (React Router) - keep AFTER /api routes
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api'))
+        return next();
+    if (req.path.startsWith('/assets'))
+        return next();
+    if (path.extname(req.path))
+        return next();
+    if (!fs.existsSync(clientIndexHtml)) {
+        return res
+            .status(500)
+            .send(`React build not found at: ${clientIndexHtml}.`);
+    }
+    res.sendFile(clientIndexHtml);
 });
 // 5. Start Server First (Prevents 504 Timeout)
 app.listen(PORT, () => {

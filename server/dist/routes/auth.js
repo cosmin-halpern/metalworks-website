@@ -1,39 +1,44 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import Admin from '../models/admin.js';
 import auth, { checkRole } from '../middleware/auth.js';
+import { adminExistsByEmailOrUsername, createAdmin, existsAnyAdmin, findAdminByEmail, findAdminById, } from '../repositories/adminRepo.js';
 const router = express.Router();
 // @route   POST api/auth/login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ msg: 'Email and password are required' });
+    }
     try {
-        let admin = await Admin.findOne({ email: email.toLowerCase() });
+        const admin = await findAdminByEmail(email.toLowerCase());
         if (!admin) {
             return res.status(400).json({ msg: 'Invalid Credentials' });
         }
-        const isMatch = await bcrypt.compare(password, admin.password);
+        const isMatch = await bcrypt.compare(password, admin.password_hash);
         if (!isMatch) {
             return res.status(400).json({ msg: 'Invalid Credentials' });
         }
         const payload = {
             user: {
-                id: admin.id,
-                role: admin.role
-            }
+                id: String(admin.id),
+                role: admin.role,
+            },
         };
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5d' }, (err, token) => {
-            if (err)
-                throw err;
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ msg: 'Server error' });
+            }
             res.json({
                 token,
-                user: { id: admin.id, username: admin.username, role: admin.role }
+                user: { id: admin.id, username: admin.username, role: admin.role },
             });
         });
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error(err);
+        res.status(500).json({ msg: 'Server error' });
     }
 });
 /**
@@ -42,27 +47,40 @@ router.post('/login', async (req, res) => {
  */
 router.post('/register', auth, checkRole(['admin']), async (req, res) => {
     const { username, email, password, role } = req.body;
+    if (!username || !email || !password) {
+        return res.status(400).json({ msg: 'username, email, password are required' });
+    }
     try {
-        let admin = await Admin.findOne({ $or: [{ email }, { username }] });
-        if (admin)
+        const emailLower = email.toLowerCase();
+        const exists = await adminExistsByEmailOrUsername(emailLower, username);
+        if (exists)
             return res.status(400).json({ msg: 'User already exists' });
-        admin = new Admin({ username, email, password, role: role || 'editor' });
-        await admin.save();
-        res.json({ msg: `User ${username} created as ${admin.role}` });
+        const passwordHash = await bcrypt.hash(password, 10);
+        const created = await createAdmin({
+            username,
+            emailLower,
+            passwordHash,
+            role: role || 'editor',
+        });
+        res.json({ msg: `User ${created.username} created as ${created.role}` });
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error(err);
+        res.status(500).json({ msg: 'Server error' });
     }
 });
 // GET current user
 router.get('/me', auth, async (req, res) => {
     try {
-        const admin = await Admin.findById(req.user?.id).select('-password');
+        const id = Number(req.user?.id);
+        if (!id || Number.isNaN(id))
+            return res.status(401).json({ msg: 'Unauthorized' });
+        const admin = await findAdminById(id);
         res.json(admin);
     }
     catch (err) {
-        res.status(500).send('Server error');
+        console.error(err);
+        res.status(500).json({ msg: 'Server error' });
     }
 });
 /**
@@ -72,19 +90,26 @@ router.get('/me', auth, async (req, res) => {
  */
 router.post('/seed-first-admin', async (req, res) => {
     const { secret, username, email, password } = req.body;
-    // Simple safety check so not anyone can call this
     if (secret !== process.env.JWT_SECRET)
         return res.status(401).send('Unauthorized');
+    if (!username || !email || !password)
+        return res.status(400).json({ msg: 'Missing fields' });
     try {
-        let admin = await Admin.findOne({ role: 'admin' });
-        if (admin)
+        const already = await existsAnyAdmin();
+        if (already)
             return res.status(400).json({ msg: 'Admin already exists' });
-        admin = new Admin({ username, email, password, role: 'admin' });
-        await admin.save();
+        const passwordHash = await bcrypt.hash(password, 10);
+        await createAdmin({
+            username,
+            emailLower: email.toLowerCase(),
+            passwordHash,
+            role: 'admin',
+        });
         res.send('First admin created successfully');
     }
     catch (err) {
-        res.status(500).send(err.message);
+        console.error(err);
+        res.status(500).send(err.message || 'Server error');
     }
 });
 export default router;

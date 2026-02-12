@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import auth, { checkRole } from '../middleware/auth.js';
-import SiteSettings from '../models/siteSettings.js';
+import { getSettingsSingleton, updateLogoUrlSingleton } from '../repositories/siteSettingsRepo.js';
 
 const router = express.Router();
 
@@ -12,31 +12,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function (_req, _file, cb) {
         const uploadPath = path.join(__dirname, '../../uploads');
         if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
         cb(null, uploadPath);
     },
-    filename: function (req, file, cb) {
+    filename: function (_req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
     },
 });
 
 const upload = multer({ storage });
 
-const getSingleton = async () => {
-    let doc = await SiteSettings.findOne();
-    if (!doc) doc = await SiteSettings.create({ logoUrl: '' });
-    return doc;
-};
-
 // Public: read settings
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
     try {
-        const settings = await getSingleton();
+        const settings = await getSettingsSingleton();
         res.json({ logoUrl: settings.logoUrl || '' });
     } catch (err: any) {
-        console.error(err.message);
+        console.error(err);
         res.status(500).send('Server Error');
     }
 });
@@ -52,11 +46,11 @@ router.put(
             const file = req.file;
             if (!file) return res.status(400).json({ msg: 'Logo file is required' });
 
-            const settings = await getSingleton();
+            const current = await getSettingsSingleton();
+            const oldLogoUrl = current.logoUrl; // "/uploads/..."
 
-            const oldLogoUrl = settings.logoUrl; // "/uploads/..."
-            settings.logoUrl = `/uploads/${file.filename}`;
-            await settings.save();
+            const newLogoUrl = `/uploads/${file.filename}`;
+            const updated = await updateLogoUrlSingleton(newLogoUrl);
 
             // best-effort delete old file
             try {
@@ -68,9 +62,9 @@ router.put(
                 // ignore
             }
 
-            res.json({ logoUrl: settings.logoUrl });
+            res.json({ logoUrl: updated.logoUrl });
         } catch (err: any) {
-            console.error(err.message);
+            console.error(err);
             res.status(500).send('Server Error');
         }
     }

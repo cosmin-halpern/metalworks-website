@@ -1,13 +1,16 @@
 const getBaseUrl = () => {
     const host = window.location.hostname;
-    // If we are developing locally
+
+    // Local dev
     if (host === 'localhost' || host === '127.0.0.1') {
         return 'http://localhost:5001';
     }
-    // If we are on the test server
+
+    // Test: same-origin API
     if (host === 'test.corsican.ro') {
-        return 'https://api-test.corsican.ro';
+        return 'https://test.corsican.ro';
     }
+
     // Production
     return 'https://api.corsican.ro';
 };

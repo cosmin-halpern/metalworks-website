@@ -68,12 +68,28 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/orders', ordersRoutes);
 
 // Serve React build (client/dist)
-const clientDistPath = path.join(__dirname, '../../client/dist');
-app.use(express.static(clientDistPath));
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+const clientIndexHtml = path.join(clientDistPath, 'index.html');
+
+app.use(
+    express.static(clientDistPath, {
+        index: false,
+    })
+);
 
 // SPA fallback (React Router) - keep AFTER /api routes
-app.get('*', (req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    if (req.path.startsWith('/assets')) return next();
+    if (path.extname(req.path)) return next();
+
+    if (!fs.existsSync(clientIndexHtml)) {
+        return res
+            .status(500)
+            .send(`React build not found at: ${clientIndexHtml}.`);
+    }
+
+    res.sendFile(clientIndexHtml);
 });
 
 // 5. Start Server First (Prevents 504 Timeout)

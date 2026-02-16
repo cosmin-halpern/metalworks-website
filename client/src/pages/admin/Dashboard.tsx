@@ -1,14 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { useEffect, useState } from 'react';
+import { getApiUrl } from '../../services/env';
 
 const AdminDashboard = () => {
     const user = authService.getUser();
     const navigate = useNavigate();
     const [newOrdersCount, setNewOrdersCount] = useState<number>(0);
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const API_URL = getApiUrl();
 
     const handleLogout = () => {
         authService.logout();
@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const loadCount = async () => {
             try {
-                const res = await fetch(`${API_BASE}/orders/new-count`, {
+                const res = await fetch(`${API_URL}/orders/new-count`, {
                     headers: authService.getAuthHeader(),
                 });
                 if (!res.ok) return;
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
         };
 
         loadCount();
-    }, [API_BASE]);
+    }, [API_URL]);
 
     return (
         <div className="min-h-screen bg-gray-100 flex">

@@ -37,7 +37,7 @@ router.get('/', async (_req, res) => {
 // (keeping same behavior as your original: auth required, no role check here)
 router.post('/', auth, upload.fields([
     { name: 'coverImage', maxCount: 1 },
-    { name: 'gallery', maxCount: 20 },
+    { name: 'gallery', maxCount: 60 },
 ]), async (req, res) => {
     try {
         const { title, description } = req.body;

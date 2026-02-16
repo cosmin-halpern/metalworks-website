@@ -45,7 +45,7 @@ router.post(
     auth,
     upload.fields([
         { name: 'coverImage', maxCount: 1 },
-        { name: 'gallery', maxCount: 20 },
+        { name: 'gallery', maxCount: 60 },
     ]),
     async (req: any, res: any) => {
         try {

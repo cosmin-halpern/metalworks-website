@@ -1,13 +1,13 @@
 import { ContactFormData, ApiResponse, Service, Product } from '../types';
-import { getApiBaseUrl } from './env';
+import {getApiUrl} from './env';
 
-const API_BASE_URL = getApiBaseUrl();
+const API_URL = getApiUrl();
 
 export const submitContactForm = async (
   formData: ContactFormData,
 ): Promise<ApiResponse<{ message: string }>> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/contact`, {
+    const response = await fetch(`${API_URL}/api/contact`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export const submitContactForm = async (
 // Add more API service functions as needed
 export const getServices = async (): Promise<ApiResponse<Service[]>> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/services`);
+    const response = await fetch(`${API_URL}/api/services`);
     if (!response.ok) {
       throw new Error('Failed to fetch services');
     }
@@ -57,7 +57,7 @@ export const getServices = async (): Promise<ApiResponse<Service[]>> => {
 
 export const getProducts = async (): Promise<ApiResponse<Product[]>> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/products`);
+    const response = await fetch(`${API_URL}/api/products`);
     if (!response.ok) {
       throw new Error('Failed to fetch products');
     }

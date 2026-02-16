@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from '../../services/authService';
 import { Link } from 'react-router-dom';
+import {getApiUrl} from "../../services/env.ts";
 
 const ManageClients = () => {
     const [clients, setClients] = useState<any[]>([]);
@@ -9,7 +10,7 @@ const ManageClients = () => {
     const [logo, setLogo] = useState<File | null>(null);
 
     // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const API_BASE = getApiUrl();
 
     useEffect(() => {
         fetchClients();

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {authService, API_URL, SERVER_URL} from '../../services/authService';
+import {authService} from '../../services/authService';
 import {Link} from 'react-router-dom';
+import {getApiBaseUrl} from "../../services/env.ts";
 
 const ManageProjects = () => {
     const [projects, setProjects] = useState<any[]>([]);
@@ -15,6 +16,8 @@ const ManageProjects = () => {
 
     // @ts-ignore
     // const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const API_URL = getApiUrl();
+    const SERVER_URL = getApiBaseUrl() || window.location.origin;
 
     useEffect(() => {
         fetchProjects();

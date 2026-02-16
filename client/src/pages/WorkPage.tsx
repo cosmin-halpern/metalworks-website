@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Banner from '../components/Banner';
 import ProjectGalleryModal from '../components/ProjectGalleryModal';
+import { getApiBaseUrl, getApiUrl } from '../services/env';
 
 // This must match exactly what your backend returns and what ProjectGalleryModal expects
 type ProjectMedia = {
@@ -23,14 +24,14 @@ const WorkPage = () => {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const SERVER_URL = 'http://localhost:5001';
+    const API_URL = getApiUrl();
+    const SERVER_URL = getApiBaseUrl() || window.location.origin;
+
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await fetch(`${API_BASE}/projects`);
+                const res = await fetch(`${API_URL}/projects`);
                 const data = await res.json();
                 setProjects(Array.isArray(data) ? data : []);
             } catch (err) {
@@ -40,7 +41,7 @@ const WorkPage = () => {
             }
         };
         fetchProjects();
-    }, [API_BASE]);
+    }, [API_URL]);
 
     const handleOpenGallery = (project: Project) => {
         setSelectedProject(project);

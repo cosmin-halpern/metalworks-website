@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { authService } from '../../services/authService';
 import { Link } from 'react-router-dom';
+import {getApiBaseUrl, getApiUrl} from "../../services/env.ts";
 
 type Product = {
     _id: string;
@@ -30,8 +31,8 @@ const ManageProducts = () => {
     const [editImage, setEditImage] = useState<File | null>(null);
 
     // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const SERVER_URL = 'http://localhost:5001';
+    const API_BASE = getApiUrl();
+    const SERVER_URL = getApiBaseUrl() || window.location.origin;
 
     const getFullUrl = (path: string) => {
         if (!path) return '';

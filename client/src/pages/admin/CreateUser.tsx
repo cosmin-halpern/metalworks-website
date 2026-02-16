@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import {getApiUrl} from "../../services/env.ts";
 
 const CreateUser = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', role: 'editor' });
@@ -8,7 +9,7 @@ const CreateUser = () => {
     // @ts-ignore
     const navigate = useNavigate();
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const API_URL = getApiUrl();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

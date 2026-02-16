@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {authService} from '../../services/authService';
 import {Link} from 'react-router-dom';
-import {getApiBaseUrl} from "../../services/env.ts";
+import { getApiBaseUrl, getApiUrl } from '../../services/env';
 
 const ManageProjects = () => {
     const [projects, setProjects] = useState<any[]>([]);

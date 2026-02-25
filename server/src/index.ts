@@ -122,14 +122,17 @@ app.use((err: any, _req: express.Request, res: express.Response, next: express.N
 });
 
 // Run pending migrations, then start accepting connections.
-// If a migration fails the process exits — better a clean crash than a broken schema.
-try {
-    await runMigrations();
-} catch (err) {
-    console.error('[migrate] Migration failed — refusing to start:', err);
-    process.exit(1);
-}
+// Wrapped in an async IIFE to avoid top-level await, which breaks cPanel's LiteSpeed
+// loader (lsnode.js uses require() which cannot handle top-level await in ESM modules).
+(async () => {
+    try {
+        await runMigrations();
+    } catch (err) {
+        console.error('[migrate] Migration failed — refusing to start:', err);
+        process.exit(1);
+    }
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+})();

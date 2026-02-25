@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import auth, { checkRole } from '../middleware/auth.js';
 import { uploadMedia } from '../middleware/upload.js';
-import { createProject, deleteProjectById, deleteProjectMedia, listProjects } from '../repositories/projectRepo.js';
+import { addProjectMedia, createProject, deleteProjectById, deleteProjectMedia, getProjectById, listProjects } from '../repositories/projectRepo.js';
 
 const router = express.Router();
 
@@ -112,6 +112,36 @@ router.delete('/:id', auth, checkRole(['admin']), async (req: any, res: any) => 
         res.status(500).send('Server Error');
     }
 });
+
+// POST — add media to an existing project's gallery
+router.post(
+    '/:id/media',
+    auth,
+    uploadMedia.array('gallery', 60),
+    async (req: any, res: any) => {
+        try {
+            const id = Number(req.params.id);
+            if (!id || Number.isNaN(id)) return res.status(400).json({ msg: 'Invalid id' });
+
+            const files = req.files as Express.Multer.File[] | undefined;
+            if (!files || files.length === 0) return res.status(400).json({ msg: 'No files uploaded' });
+
+            const project = await getProjectById(id);
+            if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+            const media = files.map((file: any) => ({
+                type: (file.mimetype?.startsWith('video') ? 'video' : 'image') as 'image' | 'video',
+                src: `/uploads/${file.filename}`,
+            }));
+
+            const added = await addProjectMedia(id, media);
+            res.json(added);
+        } catch (err: any) {
+            console.error(err);
+            res.status(500).send('Server Error');
+        }
+    }
+);
 
 // DELETE a single media item from a project's gallery
 router.delete('/:id/media/:mediaId', auth, async (req: any, res: any) => {

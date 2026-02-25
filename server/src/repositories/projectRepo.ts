@@ -171,6 +171,37 @@ export async function deleteProjectById(id: number): Promise<ProjectDTO | null> 
     return existing;
 }
 
+export async function addProjectMedia(
+    projectId: number,
+    media: { type: 'image' | 'video'; src: string }[]
+): Promise<ProjectMediaItem[]> {
+    if (!media.length) return [];
+
+    // Append after the current highest sort_order
+    const [[{ maxOrder }]] = await pool.query(
+        'SELECT COALESCE(MAX(sort_order), -1) as maxOrder FROM project_media WHERE project_id = ?',
+        [projectId]
+    ) as any;
+
+    const values = media.map((m, idx) => [projectId, m.type, m.src, Number(maxOrder) + 1 + idx]);
+    const [result] = await pool.query(
+        'INSERT INTO project_media (project_id, type, src, sort_order) VALUES ?',
+        [values]
+    );
+
+    const insertId = (result as any).insertId as number;
+    const [rows] = await pool.query(
+        'SELECT id, type, src FROM project_media WHERE project_id = ? AND id >= ? ORDER BY id ASC LIMIT ?',
+        [projectId, insertId, media.length]
+    );
+
+    return (rows as { id: number; type: 'image' | 'video'; src: string }[]).map(r => ({
+        id: r.id,
+        type: r.type,
+        src: r.src,
+    }));
+}
+
 export async function deleteProjectMedia(
     mediaId: number,
     projectId: number

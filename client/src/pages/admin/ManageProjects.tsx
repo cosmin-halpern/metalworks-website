@@ -23,6 +23,9 @@ const ManageProjects = () => {
     const [loading, setLoading] = useState(false);
     const [expandedGallery, setExpandedGallery] = useState<Set<number>>(new Set());
     const [deletingMediaId, setDeletingMediaId] = useState<number | null>(null);
+    const [addingToProjectId, setAddingToProjectId] = useState<number | null>(null);
+    const [addFiles, setAddFiles] = useState<FileList | null>(null);
+    const [uploadingMedia, setUploadingMedia] = useState(false);
 
     // Form State
     const [title, setTitle] = useState('');
@@ -98,6 +101,41 @@ const ManageProjects = () => {
             fetchProjects();
         } else {
             alert('Doar administratorii pot șterge proiecte.');
+        }
+    };
+
+    const handleAddMedia = async (projectId: number) => {
+        if (!addFiles || addFiles.length === 0) return;
+
+        setUploadingMedia(true);
+        const formData = new FormData();
+        for (let i = 0; i < addFiles.length; i++) {
+            formData.append('gallery', addFiles[i]);
+        }
+
+        try {
+            const res = await apiFetch(`${API_URL}/projects/${projectId}/media`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (res.ok) {
+                const newMedia: MediaItem[] = await res.json();
+                setProjects(prev => prev.map(p =>
+                    p.id === projectId ? { ...p, media: [...p.media, ...newMedia] } : p
+                ));
+                setAddingToProjectId(null);
+                setAddFiles(null);
+                // auto-expand gallery so new items are visible
+                setExpandedGallery(prev => new Set(prev).add(projectId));
+            } else {
+                const err = await res.json().catch(() => null);
+                alert(err?.msg || 'Eroare la încărcare');
+            }
+        } catch {
+            alert('Eroare server');
+        } finally {
+            setUploadingMedia(false);
         }
     };
 
@@ -234,8 +272,44 @@ const ManageProjects = () => {
                                 </div>
                             )}
 
-                            <div className="p-4 bg-gray-50 border-t flex justify-between">
-                                <span className="text-xs text-gray-400">Media: {project.media.length} items</span>
+                            {/* Add media to gallery */}
+                            {addingToProjectId === project.id ? (
+                                <div className="px-4 pb-3 flex gap-2 items-center">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        className="flex-1 text-sm"
+                                        onChange={e => setAddFiles(e.target.files)}
+                                    />
+                                    <button
+                                        type="button"
+                                        disabled={uploadingMedia || !addFiles}
+                                        onClick={() => handleAddMedia(project.id)}
+                                        className={`px-3 py-1 rounded text-white text-sm font-bold whitespace-nowrap ${uploadingMedia || !addFiles ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}
+                                    >
+                                        {uploadingMedia ? 'Se încarcă...' : 'Încarcă'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setAddingToProjectId(null); setAddFiles(null); }}
+                                        className="text-gray-400 hover:text-gray-600 text-sm"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ) : null}
+
+                            <div className="p-4 bg-gray-50 border-t flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xs text-gray-400">Media: {project.media.length} items</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setAddingToProjectId(project.id); setAddFiles(null); }}
+                                        className="text-xs text-blue-600 hover:underline font-medium"
+                                    >
+                                        + Adaugă în galerie
+                                    </button>
+                                </div>
                                 <button
                                     onClick={() => handleDelete(project.id)}
                                     className="text-red-600 text-sm font-bold hover:underline"

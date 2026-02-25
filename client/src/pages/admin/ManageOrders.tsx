@@ -4,7 +4,7 @@ import { getApiUrl } from '../../services/env';
 import { apiFetch } from '../../services/authService';
 
 type Order = {
-    _id: string;
+    id: number;
     orderNumber: string;
     status: string;
     total: number;
@@ -34,7 +34,7 @@ const ManageOrders = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const updateStatus = async (id: string, status: string) => {
+    const updateStatus = async (id: number, status: string) => {
         const res = await apiFetch(`${API_URL}/orders/${id}/status`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ const ManageOrders = () => {
                 ) : (
                     <div className="space-y-4">
                         {orders.map((o) => (
-                            <div key={o._id} className="bg-white border rounded-lg p-5 shadow-sm">
+                            <div key={o.id} className="bg-white border rounded-lg p-5 shadow-sm">
                                 <div className="flex items-start justify-between gap-4">
                                     <div>
                                         <p className="font-bold text-slate-900">{o.orderNumber}</p>
@@ -81,7 +81,7 @@ const ManageOrders = () => {
                                         <select
                                             className="mt-2 border rounded p-2 text-sm"
                                             value={o.status}
-                                            onChange={(e) => updateStatus(o._id, e.target.value)}
+                                            onChange={(e) => updateStatus(o.id, e.target.value)}
                                         >
                                             <option value="new">Nouă</option>
                                             <option value="processing">În procesare</option>

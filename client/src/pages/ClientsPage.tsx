@@ -22,7 +22,6 @@ const clientLogos = [
     '/images/sigleClienti/sigla17.png',
     '/images/sigleClienti/sigla18.png',
     '/images/sigleClienti/sigla19.png',
-    '/images/sigleClienti/sigla20.png',
 ];
 
 const ClientsPage: React.FC = () => {

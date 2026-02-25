@@ -1,31 +1,8 @@
-const getBaseUrl = () => {
-    const host = window.location.hostname;
+import { getApiUrl } from './env';
 
-    // Local dev
-    if (host === 'localhost' || host === '127.0.0.1') {
-        return 'http://localhost:5001';
-    }
-
-    // Test: same-origin API
-    if (host === 'test.corsican.ro') {
-        return 'https://test.corsican.ro';
-    }
-
-    // Production
-    return 'https://api.corsican.ro';
-};
-
-const BASE_URL = getBaseUrl();
-export const API_URL = `${BASE_URL}/api`;
-export const SERVER_URL = BASE_URL;
+const API_URL = getApiUrl();
 
 export const authService = {
-    setToken(token: string) {
-        localStorage.setItem('token', token);
-    },
-    getToken() {
-        return localStorage.getItem('token');
-    },
     setUser(user: any) {
         localStorage.setItem('user', JSON.stringify(user));
     },
@@ -33,12 +10,28 @@ export const authService = {
         const user = localStorage.getItem('user');
         return user ? JSON.parse(user) : null;
     },
-    logout() {
-        localStorage.removeItem('token');
+    async logout() {
+        try {
+            await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+        } catch {
+            // ignore network errors on logout
+        }
         localStorage.removeItem('user');
     },
-    getAuthHeader(): Record<string, string> {
-        const token = this.getToken();
-        return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
+/**
+ * Authenticated fetch wrapper for admin API calls.
+ * - Always sends credentials (httpOnly cookie).
+ * - On 401, clears local user state and redirects to /admin/login.
+ */
+export const apiFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const res = await fetch(url, { credentials: 'include', ...options });
+
+    if (res.status === 401) {
+        localStorage.removeItem('user');
+        window.location.href = '/admin/login';
     }
+
+    return res;
 };

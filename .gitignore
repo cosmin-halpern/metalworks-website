@@ -17,13 +17,7 @@ npm-debug.log*
 server/.env
 client/.env
 
-# Build Outputs
-# We ignore the React build because we upload it manually to public_html
-#client/dist/
-
-!client/dist/
-!server/dist/
-
-# WE DO NOT IGNORE server/dist/
-# cPanel needs the compiled JavaScript files to run the backend!
-# server/dist  <-- KEEP THIS COMMENTED OUT OR REMOVED
+# Build outputs — both are compiled by CI (GitHub Actions) and deployed via FTP.
+# Do not commit generated files; the source is the truth.
+client/dist/
+server/dist/

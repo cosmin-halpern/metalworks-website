@@ -1,6 +1,9 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import multer from 'multer';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -13,6 +16,10 @@ import clientRoutes from './routes/clients.js';
 import productRoutes from './routes/products.js';
 import settingsRoutes from './routes/settings.js';
 import ordersRoutes from './routes/orders.js';
+
+// Optional: DB ping endpoint (MySQL)
+import { dbPing } from './repositories/dbRepo.js';
+import { runMigrations } from './db/migrate.js';
 
 dotenv.config();
 
@@ -28,33 +35,49 @@ const allowedOrigins = new Set([
     'http://localhost:3000',
 ]);
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.has(origin)) return callback(null, true);
-        return callback(new Error(`CORS blocked for origin: ${origin}`), false);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-}));
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.has(origin)) return callback(null, true);
+            return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+    })
+);
 
 app.options('*', cors());
 
+app.use(helmet());
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(cookieParser());
 app.use(express.json());
 
 // Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 3. Health Check Routes (for debugging cPanel)
-app.get('/api/health', (req, res) => {
+// Health Check Routes
+app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', node: process.version });
 });
 
-// 4. Serve Static Images
+// Optional: MySQL DB check (very useful on cPanel)
+app.get('/api/db-check', async (_req, res) => {
+    try {
+        const ok = await dbPing();
+        res.json({ status: ok ? 'ok' : 'error' });
+    } catch (err: any) {
+        console.error('DB check error:', err);
+        res.status(500).json({ status: 'error', message: err?.message || 'DB check failed' });
+    }
+});
+
+// Serve Static Images
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)){
+if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 app.use('/uploads', express.static(uploadsDir));
@@ -84,22 +107,32 @@ app.get('*', (req, res, next) => {
     if (path.extname(req.path)) return next();
 
     if (!fs.existsSync(clientIndexHtml)) {
-        return res
-            .status(500)
-            .send(`React build not found at: ${clientIndexHtml}.`);
+        return res.status(500).send(`React build not found at: ${clientIndexHtml}.`);
     }
 
     res.sendFile(clientIndexHtml);
 });
 
-// 5. Start Server First (Prevents 504 Timeout)
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Multer error handler — must be after routes
+app.use((err: any, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (err instanceof multer.MulterError || err?.message?.startsWith('Only ')) {
+        return res.status(400).json({ msg: err.message });
+    }
+    next(err);
 });
 
-// 6. Connect DB in background
-if (process.env.MONGO_URI) {
-    mongoose.connect(process.env.MONGO_URI as string)
-        .then(() => console.log('MongoDB Connected'))
-        .catch(err => console.error('MongoDB Connection Error:', err));
-}
+// Run pending migrations, then start accepting connections.
+// Wrapped in an async IIFE to avoid top-level await, which breaks cPanel's LiteSpeed
+// loader (lsnode.js uses require() which cannot handle top-level await in ESM modules).
+(async () => {
+    try {
+        await runMigrations();
+    } catch (err) {
+        console.error('[migrate] Migration failed — refusing to start:', err);
+        process.exit(1);
+    }
+
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+})();

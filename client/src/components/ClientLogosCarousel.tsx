@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import {getApiBaseUrl, getApiUrl} from "../services/env.ts";
 
 const ClientLogosCarousel: React.FC = () => {
     const [logos, setLogos] = useState<any[]>([]);
     const speed = 30;
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const SERVER_URL = 'http://localhost:5001';
+    const API_URL = getApiUrl();
+    const SERVER_URL = getApiBaseUrl() || window.location.origin;
 
     useEffect(() => {
         const fetchLogos = async () => {
             try {
-                const res = await fetch(`${API_BASE}/clients`);
+                const res = await fetch(`${API_URL}/clients`);
                 const data = await res.json();
                 setLogos(data);
             } catch (err) {
@@ -20,7 +20,7 @@ const ClientLogosCarousel: React.FC = () => {
             }
         };
         fetchLogos();
-    }, [API_BASE]);
+    }, [API_URL]);
 
     if (logos.length === 0) return null;
 

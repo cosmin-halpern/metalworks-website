@@ -1,0 +1,96 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: # allow triggering manually from GitHub UI
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # needed to compare with previous commit
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── Build client ────────────────────────────────────────────────────────
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build client (Vite)
+        working-directory: client
+        run: npm run build
+
+      # ── Build server ────────────────────────────────────────────────────────
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Build server (TypeScript → JS)
+        working-directory: server
+        run: npm run build
+
+      # ── Warn if package.json changed ────────────────────────────────────────
+      # When this warning appears, go to cPanel → Setup Node.js App
+      # and click "Run NPM Install" after the deploy finishes.
+      - name: Check if server dependencies changed
+        id: deps_check
+        run: |
+          if git diff HEAD~1 HEAD --name-only | grep -qE '^server/package(-lock)?\.json$'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Warn about manual NPM install step
+        if: steps.deps_check.outputs.changed == 'true'
+        run: |
+          echo "::warning::server/package.json changed — after this deploy, go to cPanel → Setup Node.js App and click 'Run NPM Install', then restart."
+
+      # ── Trigger Passenger restart ────────────────────────────────────────────
+      # cPanel runs Node.js apps via Phusion Passenger.
+      # Passenger watches tmp/restart.txt — updating it causes the app to restart
+      # on the next incoming request, picking up the new dist/ files.
+      - name: Stamp restart.txt to trigger app restart
+        run: |
+          mkdir -p server/tmp
+          date -u > server/tmp/restart.txt
+
+      # ── FTP Deploy ──────────────────────────────────────────────────────────
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # The remote path where your project lives on the server.
+          # Usually /public_html/ or a subdirectory. Set this in your GitHub secret.
+          server-dir: ${{ secrets.FTP_REMOTE_DIR }}
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/uploads/**
+            **/.env
+            **/.env.*
+            !**/.env.example
+            server/src/**
+            server/tsconfig*.json
+            server/.eslintrc*
+            client/src/**
+            client/public/**
+            client/index.html
+            client/vite.config.*
+            client/tsconfig*.json
+            client/.vite/**
+            docker-compose.yml
+            **/*.md

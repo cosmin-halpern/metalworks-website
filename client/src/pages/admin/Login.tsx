@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {API_URL, authService} from '../../services/authService';
+import { getApiUrl } from '../../services/env';
+import { authService } from '../../services/authService';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -13,15 +14,15 @@ const Login = () => {
         e.preventDefault();
         setError('');
         try {
-            const res = await fetch(`${API_URL}/auth/login`, {
+            const res = await fetch(`${getApiUrl()}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ email, password }),
             });
             const data = await res.json();
 
             if (res.ok) {
-                authService.setToken(data.token);
                 authService.setUser(data.user);
                 navigate('/admin');
             } else {

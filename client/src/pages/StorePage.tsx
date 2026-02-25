@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Banner from '../components/Banner';
 import { useCart } from '../lib/cart';
+import { getApiUrl, getApiBaseUrl } from '../services/env';
 
 type Product = {
-    _id: string;
+    id: number;
     title: string;
     description?: string;
     price: number;
@@ -18,9 +19,8 @@ const Store = () => {
 
     const { addItem, items } = useCart();
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const SERVER_URL = 'http://localhost:5001';
+    const API_BASE = getApiUrl();
+    const SERVER_URL = getApiBaseUrl();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -46,6 +46,7 @@ const Store = () => {
     };
 
     const isInCart = (productId: string) => items.some((it) => it.productId === productId);
+
 
     if (loading) {
         return (
@@ -74,11 +75,12 @@ const Store = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {products.map((p, index) => {
-                            const inCart = isInCart(p._id);
+                            const productId = String(p.id);
+                            const inCart = isInCart(productId);
 
                             return (
                                 <motion.div
-                                    key={p._id}
+                                    key={productId}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -97,7 +99,7 @@ const Store = () => {
                                                 type="button"
                                                 onClick={() =>
                                                     addItem({
-                                                        productId: p._id,
+                                                        productId,
                                                         title: p.title,
                                                         price: p.price,
                                                         imageUrl: getFullUrl(p.imageUrl),

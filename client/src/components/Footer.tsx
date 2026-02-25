@@ -6,7 +6,7 @@ const Footer = () => {
     return (
         <footer className="bg-primary-dark text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
                         <h3 className="text-xl font-bold mb-4">Corsican Engineering</h3>
                         <p className="text-gray-300">
@@ -30,6 +30,32 @@ const Footer = () => {
                             <li>
                                 <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
                                     Contact
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4">Informații legale</h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link to="/termeni-si-conditii" className="text-gray-300 hover:text-white transition-colors">
+                                    Termeni și Condiții
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/politica-de-confidentialitate" className="text-gray-300 hover:text-white transition-colors">
+                                    Politica de Confidențialitate
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/politica-de-cookies" className="text-gray-300 hover:text-white transition-colors">
+                                    Politica de Cookies
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/politica-de-retur" className="text-gray-300 hover:text-white transition-colors">
+                                    Politica de Retur
                                 </Link>
                             </li>
                         </ul>

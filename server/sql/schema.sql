@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS orders (
     order_number            VARCHAR(64)     NOT NULL,
     status                  ENUM('new','processing','shipped','completed','cancelled') NOT NULL DEFAULT 'new',
     payment_method          ENUM('cash','bank','card') NOT NULL,
+    payment_status          ENUM('pending','paid','failed') NOT NULL DEFAULT 'pending',
+    netopia_ntf_url         VARCHAR(1024)   NOT NULL DEFAULT '',
     total                   DECIMAL(10,2)   NOT NULL DEFAULT 0,
 
     shipping_full_name      VARCHAR(255)    NOT NULL,

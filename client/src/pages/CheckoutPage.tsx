@@ -134,8 +134,14 @@ const CheckoutPage = () => {
             }
 
             const data = await res.json();
-            setOrderNumber(data?.orderNumber || null);
 
+            if (data?.paymentURL) {
+                clear();
+                window.location.href = data.paymentURL;
+                return;
+            }
+
+            setOrderNumber(data?.orderNumber || null);
             clear();
         } catch (e) {
             alert('Nu s-a putut contacta serverul. Verificați conexiunea.');
@@ -389,7 +395,7 @@ const CheckoutPage = () => {
                                                 checked={payment === 'card'}
                                                 onChange={() => setPayment('card')}
                                             />
-                                            Card online (în curând)
+                                            Card online
                                         </label>
                                     </div>
                                 </div>

@@ -29,11 +29,14 @@ export type OrderItemSnapshot = {
     imageUrl: string;
 };
 
+export type PaymentStatus = 'pending' | 'paid' | 'failed';
+
 export type OrderDTO = {
     id: number;
     orderNumber: string;
     status: OrderStatus;
     paymentMethod: PaymentMethod;
+    paymentStatus: PaymentStatus;
     total: number;
     items: OrderItemSnapshot[];
     shipping: CreateOrderInput['shipping'];
@@ -102,6 +105,7 @@ export async function getOrderById(orderId: number): Promise<OrderDTO | null> {
                 order_number,
                 status,
                 payment_method,
+                payment_status,
                 total,
                 shipping_full_name,
                 shipping_phone,
@@ -131,6 +135,7 @@ export async function getOrderById(orderId: number): Promise<OrderDTO | null> {
         orderNumber: String(o.order_number),
         status: String(o.status) as OrderStatus,
         paymentMethod: String(o.payment_method) as PaymentMethod,
+        paymentStatus: (String(o.payment_status || 'pending')) as PaymentStatus,
         total: Number(o.total),
         items,
         shipping: {
@@ -352,4 +357,15 @@ export async function countNewOrders(): Promise<number> {
 export async function updateOrderStatus(orderId: number, status: OrderStatus): Promise<OrderDTO | null> {
     await pool.query('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
     return await getOrderById(orderId);
+}
+
+export async function updatePaymentStatus(
+    orderNumber: string,
+    paymentStatus: PaymentStatus,
+    ntfUrl = ''
+): Promise<void> {
+    await pool.query(
+        'UPDATE orders SET payment_status = ?, netopia_ntf_url = ? WHERE order_number = ?',
+        [paymentStatus, ntfUrl, orderNumber]
+    );
 }

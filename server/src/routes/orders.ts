@@ -7,7 +7,9 @@ import {
     createOrderTransactional,
     listOrders,
     updateOrderStatus,
+    updatePaymentStatus,
     type OrderStatus,
+    type PaymentStatus,
 } from '../repositories/orderRepo.js';
 
 const router = express.Router();
@@ -152,6 +154,68 @@ router.post('/', async (req, res) => {
             }).catch((e) => console.error(`[email] Customer confirmation failed for order ${created.orderNumber} to ${shipping.email}:`, e));
         }
 
+        // Netopia card payment: initiate hosted payment and return redirect URL
+        if (paymentMethod === 'card') {
+            try {
+                const { Netopia } = await import('netopia-card');
+
+                const netopia = new Netopia({
+                    apiKey: process.env.NETOPIA_API_KEY,
+                    sandbox: process.env.NETOPIA_LIVE !== 'true',
+                    posSignature: process.env.NETOPIA_SIGNATURE,
+                    notifyUrl: process.env.NETOPIA_CONFIRM_URL,
+                    redirectUrl: `${process.env.NETOPIA_RETURN_URL}?order=${created.orderNumber}`,
+                    apiBaseUrl: process.env.NETOPIA_API_BASE_URL,
+                });
+
+                const nameParts = shipping.fullName.trim().split(/\s+/);
+                const firstName = nameParts[0];
+                const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
+
+                netopia.setOrderData({
+                    orderID: created.orderNumber,
+                    amount: created.total,
+                    currency: 'RON',
+                    description: `Comanda ${created.orderNumber}`,
+                    billing: {
+                        email: shipping.email,
+                        firstName,
+                        lastName,
+                        phone: shipping.phone,
+                        city: shipping.city,
+                        country: 642, // Romania
+                        countryName: 'Romania',
+                        state: '',
+                        postalCode: '',
+                        details: shipping.address,
+                    },
+                });
+
+                netopia.setProductsData(
+                    created.items.map((item) => ({
+                        name: item.title,
+                        code: String(item.productId),
+                        category: 'general',
+                        price: item.price,
+                        vat: 19,
+                    }))
+                );
+
+                const netopiaResponse = await netopia.startPayment();
+
+                if (netopiaResponse?.paymentURL) {
+                    return res.json({
+                        orderId: created.orderId,
+                        orderNumber: created.orderNumber,
+                        paymentURL: netopiaResponse.paymentURL,
+                    });
+                }
+            } catch (netopiaErr) {
+                console.error(`[netopia] Failed to initiate payment for order ${created.orderNumber}:`, netopiaErr);
+                // Fall through — order is saved; customer will be shown order number
+            }
+        }
+
         res.json({ orderId: created.orderId, orderNumber: created.orderNumber });
     } catch (err: any) {
         console.error(err);
@@ -188,6 +252,35 @@ router.get('/new-count', auth, checkRole(['admin']), async (_req, res) => {
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');
+    }
+});
+
+// Netopia IPN (Instant Payment Notification) — no auth, called by Netopia servers
+router.post('/ipn', express.text({ type: '*/*' }), async (req, res) => {
+    try {
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        const { order, payment } = body ?? {};
+
+        const orderNumber = String(order?.orderID ?? '');
+        const statusCode = Number(payment?.status ?? -1);
+        const ntfUrl = String(order?.ntfURL ?? '');
+
+        let paymentStatus: PaymentStatus = 'pending';
+        if (statusCode === 5) {
+            paymentStatus = 'paid';
+        } else if (statusCode === 3 || statusCode === 7 || statusCode === 8) {
+            paymentStatus = 'failed';
+        }
+
+        if (orderNumber) {
+            await updatePaymentStatus(orderNumber, paymentStatus, ntfUrl);
+        }
+
+        res.status(200).json({ errorCode: 0 });
+    } catch (err) {
+        console.error('[ipn] Error processing notification:', err);
+        // Always return 200 to prevent Netopia retry loops
+        res.status(200).json({ errorCode: 0 });
     }
 });
 

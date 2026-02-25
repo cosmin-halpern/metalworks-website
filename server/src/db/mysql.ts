@@ -25,6 +25,9 @@ export const pool = mysql.createPool({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
+    connectionLimit: 5,       // shared cPanel hosts cap connections per user at ~10–25
+    queueLimit: 50,           // cap queue so requests fail fast under overload
+    connectTimeout: 10_000,   // 10 s — prevent silent hangs if MySQL is slow to respond
+    enableKeepAlive: true,    // recycle idle connections before the server drops them
+    keepAliveInitialDelay: 30_000, // start keep-alive pings after 30 s of idle
 });

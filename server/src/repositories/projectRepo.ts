@@ -1,6 +1,7 @@
 import { pool } from '../db/mysql.js';
 
 export type ProjectMediaItem = {
+    id?: number;
     type: 'image' | 'video';
     src: string;
 };
@@ -43,25 +44,45 @@ async function getProjectMedia(projectId: number): Promise<ProjectMediaItem[]> {
         [projectId]
     );
 
-    return (rows as ProjectMediaRow[]).map((r) => ({ type: r.type, src: r.src }));
+    return (rows as ProjectMediaRow[]).map((r) => ({ id: r.id, type: r.type, src: r.src }));
 }
 
-export async function listProjects(): Promise<ProjectDTO[]> {
+const MAX_PAGE_SIZE = 100;
+
+export type PaginatedResult<T> = {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+};
+
+export async function listProjects(
+    page = 1,
+    limit = 20
+): Promise<PaginatedResult<ProjectDTO>> {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), MAX_PAGE_SIZE);
+    const offset = (safePage - 1) * safeLimit;
+
+    const [[{ total }]] = await pool.query(
+        'SELECT COUNT(*) as total FROM projects'
+    ) as any;
+
     const [rows] = await pool.query(
-        `
-    SELECT id, title, description, cover_image, created_at, updated_at
-    FROM projects
-    ORDER BY created_at DESC
-    `
+        `SELECT id, title, description, cover_image, created_at, updated_at
+         FROM projects
+         ORDER BY created_at DESC
+         LIMIT ? OFFSET ?`,
+        [safeLimit, offset]
     );
 
     const projects = rows as ProjectRow[];
 
-    // Fetch media for each project (simple approach; OK for small/medium lists)
-    const result: ProjectDTO[] = [];
+    const data: ProjectDTO[] = [];
     for (const p of projects) {
         const media = await getProjectMedia(p.id);
-        result.push({
+        data.push({
             id: p.id,
             title: p.title,
             description: p.description,
@@ -72,7 +93,13 @@ export async function listProjects(): Promise<ProjectDTO[]> {
         });
     }
 
-    return result;
+    return {
+        data,
+        total: Number(total),
+        page: safePage,
+        limit: safeLimit,
+        pages: Math.ceil(Number(total) / safeLimit),
+    };
 }
 
 export async function getProjectById(id: number): Promise<ProjectDTO | null> {
@@ -142,4 +169,19 @@ export async function deleteProjectById(id: number): Promise<ProjectDTO | null> 
     await pool.query('DELETE FROM projects WHERE id = ?', [id]);
 
     return existing;
+}
+
+export async function deleteProjectMedia(
+    mediaId: number,
+    projectId: number
+): Promise<{ src: string } | null> {
+    const [rows] = await pool.query(
+        'SELECT id, src FROM project_media WHERE id = ? AND project_id = ? LIMIT 1',
+        [mediaId, projectId]
+    );
+    const row = (rows as { id: number; src: string }[])[0];
+    if (!row) return null;
+
+    await pool.query('DELETE FROM project_media WHERE id = ?', [mediaId]);
+    return { src: row.src };
 }

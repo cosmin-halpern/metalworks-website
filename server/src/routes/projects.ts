@@ -1,37 +1,35 @@
 import express from 'express';
-import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { z } from 'zod';
 import auth, { checkRole } from '../middleware/auth.js';
-import { createProject, deleteProjectById, listProjects } from '../repositories/projectRepo.js';
+import { uploadMedia } from '../middleware/upload.js';
+import { createProject, deleteProjectById, deleteProjectMedia, listProjects } from '../repositories/projectRepo.js';
 
 const router = express.Router();
+
+const createProjectSchema = z.object({
+    title: z.string().min(1).max(200),
+    description: z.string().min(1),
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configure Multer
-const storage = multer.diskStorage({
-    destination: function (_req, _file, cb) {
-        const uploadPath = path.join(__dirname, '../../uploads');
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-    },
-    filename: function (_req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    },
+const paginationSchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-const upload = multer({ storage });
-
 // GET all projects
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const projects = await listProjects();
-        res.json(projects);
+        const parsed = paginationSchema.safeParse(req.query);
+        if (!parsed.success) return res.status(400).json({ msg: 'Invalid pagination params' });
+
+        const result = await listProjects(parsed.data.page, parsed.data.limit);
+        res.json(result);
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -43,16 +41,19 @@ router.get('/', async (_req, res) => {
 router.post(
     '/',
     auth,
-    upload.fields([
+    uploadMedia.fields([
         { name: 'coverImage', maxCount: 1 },
-        { name: 'gallery', maxCount: 20 },
+        { name: 'gallery', maxCount: 60 },
     ]),
     async (req: any, res: any) => {
         try {
-            const { title, description } = req.body as { title?: string; description?: string };
-
-            if (!title) return res.status(400).json({ msg: 'title is required' });
-            if (!description) return res.status(400).json({ msg: 'description is required' });
+            const parsed = createProjectSchema.safeParse(req.body);
+            if (!parsed.success) {
+                return res.status(400).json({
+                    msg: 'Validation failed',
+                    errors: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+                });
+            }
 
             const coverImageFile = req.files?.['coverImage']?.[0] ?? null;
             if (!coverImageFile) return res.status(400).json({ msg: 'Cover image is required' });
@@ -68,8 +69,7 @@ router.post(
             }
 
             const created = await createProject({
-                title: String(title),
-                description: String(description),
+                ...parsed.data,
                 coverImage: coverImagePath,
                 media,
             });
@@ -107,6 +107,32 @@ router.delete('/:id', auth, checkRole(['admin']), async (req: any, res: any) => 
         }
 
         res.json({ msg: 'Project removed' });
+    } catch (err: any) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// DELETE a single media item from a project's gallery
+router.delete('/:id/media/:mediaId', auth, async (req: any, res: any) => {
+    try {
+        const projectId = Number(req.params.id);
+        const mediaId = Number(req.params.mediaId);
+        if (!projectId || Number.isNaN(projectId) || !mediaId || Number.isNaN(mediaId)) {
+            return res.status(400).json({ msg: 'Invalid id' });
+        }
+
+        const deleted = await deleteProjectMedia(mediaId, projectId);
+        if (!deleted) return res.status(404).json({ msg: 'Media item not found' });
+
+        try {
+            const abs = path.join(__dirname, '../../', deleted.src.replace(/^\//, ''));
+            if (fs.existsSync(abs)) fs.unlinkSync(abs);
+        } catch {
+            // ignore file deletion errors
+        }
+
+        res.json({ msg: 'Media item removed' });
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');

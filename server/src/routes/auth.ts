@@ -1,6 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
+import { z } from 'zod';
 import auth, { AuthRequest, checkRole } from '../middleware/auth.js';
 import {
     adminExistsByEmailOrUsername,
@@ -12,13 +14,34 @@ import {
 
 const router = express.Router();
 
-// @route   POST api/auth/login
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body as { email?: string; password?: string };
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(1),
+});
 
-    if (!email || !password) {
+const registerSchema = z.object({
+    username: z.string().min(1).max(50),
+    email: z.string().email(),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    role: z.enum(['admin', 'editor']).optional().default('editor'),
+});
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    message: { msg: 'Too many login attempts, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// @route   POST api/auth/login
+router.post('/login', loginLimiter, async (req, res) => {
+    const parsed = loginSchema.safeParse(req.body);
+    if (!parsed.success) {
         return res.status(400).json({ msg: 'Email and password are required' });
     }
+
+    const { email, password } = parsed.data;
 
     try {
         const admin = await findAdminByEmail(email.toLowerCase());
@@ -48,10 +71,15 @@ router.post('/login', async (req, res) => {
                     return res.status(500).json({ msg: 'Server error' });
                 }
 
-                res.json({
-                    token,
-                    user: { id: admin.id, username: admin.username, role: admin.role },
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'lax',
+                    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+                    path: '/',
                 });
+
+                res.json({ user: { id: admin.id, username: admin.username, role: admin.role } });
             }
         );
     } catch (err: any) {
@@ -65,16 +93,15 @@ router.post('/login', async (req, res) => {
  * @desc    Create a new admin/editor. Restricted to logged-in ADMINS only.
  */
 router.post('/register', auth, checkRole(['admin']), async (req, res) => {
-    const { username, email, password, role } = req.body as {
-        username?: string;
-        email?: string;
-        password?: string;
-        role?: 'admin' | 'editor';
-    };
-
-    if (!username || !email || !password) {
-        return res.status(400).json({ msg: 'username, email, password are required' });
+    const parsed = registerSchema.safeParse(req.body);
+    if (!parsed.success) {
+        return res.status(400).json({
+            msg: 'Validation failed',
+            errors: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+        });
     }
+
+    const { username, email, password, role } = parsed.data;
 
     try {
         const emailLower = email.toLowerCase();
@@ -86,7 +113,7 @@ router.post('/register', auth, checkRole(['admin']), async (req, res) => {
             username,
             emailLower,
             passwordHash,
-            role: role || 'editor',
+            role,
         });
 
         res.json({ msg: `User ${created.username} created as ${created.role}` });
@@ -94,6 +121,12 @@ router.post('/register', auth, checkRole(['admin']), async (req, res) => {
         console.error(err);
         res.status(500).json({ msg: 'Server error' });
     }
+});
+
+// POST logout — clears the auth cookie
+router.post('/logout', (_req, res) => {
+    res.clearCookie('token', { httpOnly: true, sameSite: 'lax', path: '/' });
+    res.json({ msg: 'Logged out' });
 });
 
 // GET current user
@@ -123,7 +156,7 @@ router.post('/seed-first-admin', async (req, res) => {
         password?: string;
     };
 
-    if (secret !== process.env.JWT_SECRET) return res.status(401).send('Unauthorized');
+    if (!process.env.SEED_SECRET || secret !== process.env.SEED_SECRET) return res.status(401).send('Unauthorized');
     if (!username || !email || !password) return res.status(400).json({ msg: 'Missing fields' });
 
     try {

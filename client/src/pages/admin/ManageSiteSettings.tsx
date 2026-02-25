@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authService } from '../../services/authService';
+import { getApiBaseUrl, getApiUrl } from '../../services/env';
+import { apiFetch } from '../../services/authService';
 
 const ManageSiteSettings = () => {
     const [loading, setLoading] = useState(false);
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [currentLogoUrl, setCurrentLogoUrl] = useState<string>('');
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const SERVER_URL = 'http://localhost:5001';
+    const API_URL = getApiUrl();
+    const SERVER_URL = getApiBaseUrl() || window.location.origin;
 
     const toFullUrl = (path: string) => {
         if (!path) return '';
@@ -18,7 +18,7 @@ const ManageSiteSettings = () => {
     };
 
     const fetchSettings = async () => {
-        const res = await fetch(`${API_BASE}/settings`);
+        const res = await fetch(`${API_URL}/settings`);
         const data = await res.json();
         setCurrentLogoUrl(data?.logoUrl ? toFullUrl(data.logoUrl) : '');
     };
@@ -37,9 +37,8 @@ const ManageSiteSettings = () => {
         formData.append('logo', logoFile);
 
         try {
-            const res = await fetch(`${API_BASE}/settings/logo`, {
+            const res = await apiFetch(`${API_URL}/settings/logo`, {
                 method: 'PUT',
-                headers: authService.getAuthHeader(),
                 body: formData,
             });
 

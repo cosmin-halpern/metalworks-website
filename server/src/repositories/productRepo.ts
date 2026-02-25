@@ -37,12 +37,11 @@ function toDTO(row: ProductRow): ProductDTO {
 
 export async function listActiveProducts(): Promise<ProductDTO[]> {
     const [rows] = await pool.query(
-        `
-    SELECT id, title, description, price, image_url, active, created_at, updated_at
-    FROM products
-    WHERE active = 1
-    ORDER BY created_at DESC
-    `
+        `SELECT id, title, description, price, image_url, active, created_at, updated_at
+         FROM products
+         WHERE active = 1
+         ORDER BY created_at DESC
+         LIMIT 100`
     );
     return (rows as ProductRow[]).map(toDTO);
 }

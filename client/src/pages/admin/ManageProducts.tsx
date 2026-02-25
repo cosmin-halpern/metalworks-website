@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { authService } from '../../services/authService';
 import { Link } from 'react-router-dom';
+import {getApiBaseUrl, getApiUrl} from "../../services/env.ts";
+import { apiFetch } from '../../services/authService';
 
 type Product = {
-    _id: string;
+    id: number;
     title: string;
     description?: string;
     price: number;
@@ -22,16 +23,15 @@ const ManageProducts = () => {
     const [image, setImage] = useState<File | null>(null);
 
     // edit
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingId, setEditingId] = useState<number | null>(null);
     const [editTitle, setEditTitle] = useState('');
     const [editDescription, setEditDescription] = useState('');
     const [editPrice, setEditPrice] = useState<string>('0');
     const [editActive, setEditActive] = useState<boolean>(true);
     const [editImage, setEditImage] = useState<File | null>(null);
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const SERVER_URL = 'http://localhost:5001';
+    const API_BASE = getApiUrl();
+    const SERVER_URL = getApiBaseUrl() || window.location.origin;
 
     const getFullUrl = (path: string) => {
         if (!path) return '';
@@ -60,7 +60,7 @@ const ManageProducts = () => {
     };
 
     const startEdit = (p: Product) => {
-        setEditingId(p._id);
+        setEditingId(p.id);
         setEditTitle(p.title);
         setEditDescription(p.description || '');
         setEditPrice(String(p.price));
@@ -91,9 +91,8 @@ const ManageProducts = () => {
         formData.append('image', image);
 
         try {
-            const res = await fetch(`${API_BASE}/products`, {
+            const res = await apiFetch(`${API_BASE}/products`, {
                 method: 'POST',
-                headers: authService.getAuthHeader(),
                 body: formData,
             });
 
@@ -125,9 +124,8 @@ const ManageProducts = () => {
         if (editImage) formData.append('image', editImage);
 
         try {
-            const res = await fetch(`${API_BASE}/products/${editingId}`, {
+            const res = await apiFetch(`${API_BASE}/products/${editingId}`, {
                 method: 'PUT',
-                headers: authService.getAuthHeader(),
                 body: formData,
             });
 
@@ -146,14 +144,11 @@ const ManageProducts = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if (!window.confirm('Ștergi acest produs?')) return;
 
         try {
-            const res = await fetch(`${API_BASE}/products/${id}`, {
-                method: 'DELETE',
-                headers: authService.getAuthHeader(),
-            });
+            const res = await apiFetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
 
             if (res.ok) await fetchProducts();
             else alert('Doar administratorii pot șterge.');
@@ -161,6 +156,8 @@ const ManageProducts = () => {
             alert('Eroare server');
         }
     };
+
+    const editingProduct = editingId !== null ? products.find(p => p.id === editingId) ?? null : null;
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
@@ -238,7 +235,7 @@ const ManageProducts = () => {
                 </form>
 
                 {/* Edit */}
-                {editingId && (
+                {editingId !== null && (
                     <form
                         onSubmit={handleUpdate}
                         className="bg-white p-6 rounded-lg shadow-md mb-10 flex flex-col gap-4 border-t-4 border-amber-500"
@@ -290,6 +287,15 @@ const ManageProducts = () => {
                             </div>
                             <div className="md:col-span-1">
                                 <label className="block text-sm font-medium mb-1">Imagine nouă (opțional)</label>
+                                {editingProduct && (
+                                    <div className="mb-2 w-16 h-12 bg-gray-100 rounded overflow-hidden">
+                                        <img
+                                            src={getFullUrl(editingProduct.imageUrl)}
+                                            alt="Imagine curentă"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                )}
                                 <input
                                     id="product-edit-image-input"
                                     type="file"
@@ -327,7 +333,7 @@ const ManageProducts = () => {
                 {/* List */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {products.map((p) => (
-                        <div key={p._id} className="bg-white p-4 rounded-lg shadow relative border">
+                        <div key={p.id} className="bg-white p-4 rounded-lg shadow relative border">
                             <div className="flex gap-4">
                                 <div className="w-28 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                                     <img
@@ -362,7 +368,7 @@ const ManageProducts = () => {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => handleDelete(p._id)}
+                                            onClick={() => handleDelete(p.id)}
                                             className="px-3 py-1.5 rounded bg-red-600 text-white text-sm font-bold hover:bg-red-700"
                                         >
                                             Șterge

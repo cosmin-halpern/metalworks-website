@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { authService } from '../../services/authService.ts';
 
 const ProtectedRoute = () => {
-    const isAuthenticated = !!authService.getToken();
+    const isAuthenticated = !!authService.getUser();
 
     if (!isAuthenticated) {
         return <Navigate to="/admin/login" replace />;

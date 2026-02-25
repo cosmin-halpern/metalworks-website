@@ -118,7 +118,7 @@ router.post('/', async (req, res) => {
                 subject: `Comandă nouă ${created.orderNumber} (${created.total} RON)`,
                 text: `Comandă nouă ${created.orderNumber}. Total: ${created.total} RON. Client: ${shipping.fullName} (${shipping.phone}).`,
                 html,
-            }).catch((e) => console.error('Order admin email error:', e));
+            }).catch((e) => console.error(`[email] Admin notification failed for order ${created.orderNumber}:`, e));
         }
 
         // Customer email (best-effort)
@@ -149,21 +149,32 @@ router.post('/', async (req, res) => {
                 subject: `Confirmare comandă ${created.orderNumber}`,
                 text: `Comanda ta ${created.orderNumber} a fost înregistrată. Total: ${created.total} RON.`,
                 html: customerHtml,
-            }).catch((e) => console.error('Order customer email error:', e));
+            }).catch((e) => console.error(`[email] Customer confirmation failed for order ${created.orderNumber} to ${shipping.email}:`, e));
         }
 
         res.json({ orderId: created.orderId, orderNumber: created.orderNumber });
     } catch (err: any) {
         console.error(err);
+        if (err?.code === 'INSUFFICIENT_STOCK') {
+            return res.status(409).json({ msg: 'Unul sau mai multe produse nu mai sunt disponibile în cantitatea solicitată.' });
+        }
         res.status(500).send('Server Error');
     }
 });
 
+const paginationSchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+});
+
 // List orders (admin)
-router.get('/', auth, checkRole(['admin']), async (_req, res) => {
+router.get('/', auth, checkRole(['admin']), async (req, res) => {
     try {
-        const orders = await listOrders(200);
-        res.json(orders);
+        const parsed = paginationSchema.safeParse(req.query);
+        if (!parsed.success) return res.status(400).json({ msg: 'Invalid pagination params' });
+
+        const result = await listOrders(parsed.data.page, parsed.data.limit);
+        res.json(result);
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');

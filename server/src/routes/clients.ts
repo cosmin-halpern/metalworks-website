@@ -1,9 +1,10 @@
 import express from 'express';
-import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { z } from 'zod';
 import auth from '../middleware/auth.js';
+import { uploadImage } from '../middleware/upload.js';
 import {
     createClientLogo,
     deleteClientLogoById,
@@ -14,16 +15,9 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const storage = multer.diskStorage({
-    destination: (_req, _file, cb) => {
-        const uploadDir = path.join(__dirname, '../../uploads');
-        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-        cb(null, uploadDir);
-    },
-    filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+const createClientSchema = z.object({
+    name: z.string().max(100).optional(),
 });
-
-const upload = multer({ storage });
 
 function parseId(idParam: string): number | null {
     const id = Number(idParam);
@@ -43,14 +37,19 @@ router.get('/', async (_req, res) => {
 });
 
 // POST new logo (auth)
-router.post('/', auth, upload.single('logo'), async (req: any, res: any) => {
+router.post('/', auth, uploadImage.single('logo'), async (req: any, res: any) => {
     try {
         if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
 
-        const name = req.body?.name
-            ? String(req.body.name)
-            : String(req.file.originalname);
+        const parsed = createClientSchema.safeParse(req.body);
+        if (!parsed.success) {
+            return res.status(400).json({
+                msg: 'Validation failed',
+                errors: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+            });
+        }
 
+        const name = parsed.data.name ?? req.file.originalname;
         const src = `/uploads/${req.file.filename}`;
 
         const created = await createClientLogo({ name, src });

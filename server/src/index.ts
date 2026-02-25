@@ -1,5 +1,9 @@
 import express from 'express';
+import multer from 'multer';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -15,6 +19,7 @@ import ordersRoutes from './routes/orders.js';
 
 // Optional: DB ping endpoint (MySQL)
 import { dbPing } from './repositories/dbRepo.js';
+import { runMigrations } from './db/migrate.js';
 
 dotenv.config();
 
@@ -45,6 +50,9 @@ app.use(
 
 app.options('*', cors());
 
+app.use(helmet());
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(cookieParser());
 app.use(express.json());
 
 // Fix for __dirname in ES modules
@@ -105,7 +113,23 @@ app.get('*', (req, res, next) => {
     res.sendFile(clientIndexHtml);
 });
 
-// Start server
+// Multer error handler — must be after routes
+app.use((err: any, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (err instanceof multer.MulterError || err?.message?.startsWith('Only ')) {
+        return res.status(400).json({ msg: err.message });
+    }
+    next(err);
+});
+
+// Run pending migrations, then start accepting connections.
+// If a migration fails the process exits — better a clean crash than a broken schema.
+try {
+    await runMigrations();
+} catch (err) {
+    console.error('[migrate] Migration failed — refusing to start:', err);
+    process.exit(1);
+}
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

@@ -1,5 +1,6 @@
 import {useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import { getApiUrl } from '../services/env';
 import {useCart} from '../lib/cart';
 
 type ShippingDetails = {
@@ -59,8 +60,7 @@ const CheckoutPage = () => {
     const [placing, setPlacing] = useState(false);
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
-    // @ts-ignore
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const API_BASE = getApiUrl();
 
     const total = useMemo(
         () => items.reduce((sum, it) => sum + it.price * it.quantity, 0),

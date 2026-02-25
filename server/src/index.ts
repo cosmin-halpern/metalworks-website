@@ -28,6 +28,10 @@ const app = express();
 // 1. Dynamic Port for cPanel (Passenger uses a pipe string)
 const PORT = process.env.PORT || 5000;
 
+// Trust the first proxy (LiteSpeed/nginx reverse proxy on cPanel).
+// Required for express-rate-limit to correctly read client IPs from X-Forwarded-For.
+app.set('trust proxy', 1);
+
 // 2. Comprehensive CORS for testing
 const allowedOrigins = new Set([
     'https://test.corsican.ro',

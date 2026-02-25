@@ -11,7 +11,9 @@ export interface AuthRequest extends Request {
 const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
     // Check for token in headers (using Standard 'Authorization' header is better for production)
     const authHeader = req.header('Authorization');
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : req.header('x-auth-token');
+    const token = authHeader?.startsWith('Bearer ')
+        ? authHeader.split(' ')[1]
+        : req.header('x-auth-token') ?? req.cookies?.token;
 
     if (!token) {
         return res.status(401).json({ msg: 'No token, authorization denied' });

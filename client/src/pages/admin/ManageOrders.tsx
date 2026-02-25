@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authService } from '../../services/authService';
 import { getApiUrl } from '../../services/env';
+import { apiFetch } from '../../services/authService';
 
 type Order = {
     _id: string;
@@ -21,11 +21,9 @@ const ManageOrders = () => {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/orders`, {
-                headers: authService.getAuthHeader(),
-            });
+            const res = await apiFetch(`${API_URL}/orders?limit=100`);
             const data = await res.json();
-            setOrders(Array.isArray(data) ? data : []);
+            setOrders(Array.isArray(data.data) ? data.data : []);
         } finally {
             setLoading(false);
         }
@@ -37,12 +35,9 @@ const ManageOrders = () => {
     }, []);
 
     const updateStatus = async (id: string, status: string) => {
-        const res = await fetch(`${API_URL}/orders/${id}/status`, {
+        const res = await apiFetch(`${API_URL}/orders/${id}/status`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                ...authService.getAuthHeader(),
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status }),
         });
 

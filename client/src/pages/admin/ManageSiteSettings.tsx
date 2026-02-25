@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authService } from '../../services/authService';
 import { getApiBaseUrl, getApiUrl } from '../../services/env';
+import { apiFetch } from '../../services/authService';
 
 const ManageSiteSettings = () => {
     const [loading, setLoading] = useState(false);
@@ -37,9 +37,8 @@ const ManageSiteSettings = () => {
         formData.append('logo', logoFile);
 
         try {
-            const res = await fetch(`${API_URL}/settings/logo`, {
+            const res = await apiFetch(`${API_URL}/settings/logo`, {
                 method: 'PUT',
-                headers: authService.getAuthHeader(),
                 body: formData,
             });
 

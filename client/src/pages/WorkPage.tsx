@@ -31,9 +31,9 @@ const WorkPage = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await fetch(`${API_URL}/projects`);
+                const res = await fetch(`${API_URL}/projects?limit=100`);
                 const data = await res.json();
-                setProjects(Array.isArray(data) ? data : []);
+                setProjects(Array.isArray(data.data) ? data.data : []);
             } catch (err) {
                 console.error('Failed to load projects:', err);
             } finally {

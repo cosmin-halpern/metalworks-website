@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { authService } from '../../services/authService';
 import { Link } from 'react-router-dom';
 import {getApiUrl} from "../../services/env.ts";
+import { apiFetch } from '../../services/authService';
 
 const ManageClients = () => {
     const [clients, setClients] = useState<any[]>([]);
@@ -32,9 +32,8 @@ const ManageClients = () => {
         formData.append('logo', logo);
 
         try {
-            const res = await fetch(`${API_BASE}/clients`, {
+            const res = await apiFetch(`${API_BASE}/clients`, {
                 method: 'POST',
-                headers: authService.getAuthHeader(),
                 body: formData,
             });
 
@@ -58,10 +57,7 @@ const ManageClients = () => {
         if (!window.confirm('Ștergi acest client?')) return;
 
         try {
-            const res = await fetch(`${API_BASE}/clients/${id}`, {
-                method: 'DELETE',
-                headers: authService.getAuthHeader(),
-            });
+            const res = await apiFetch(`${API_BASE}/clients/${id}`, { method: 'DELETE' });
             if (res.ok) fetchClients();
             else alert('Doar administratorii pot șterge.');
         } catch (error) {

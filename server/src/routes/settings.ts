@@ -1,28 +1,15 @@
 import express from 'express';
-import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import auth, { checkRole } from '../middleware/auth.js';
+import { uploadImage } from '../middleware/upload.js';
 import { getSettingsSingleton, updateLogoUrlSingleton } from '../repositories/siteSettingsRepo.js';
 
 const router = express.Router();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const storage = multer.diskStorage({
-    destination: function (_req, _file, cb) {
-        const uploadPath = path.join(__dirname, '../../uploads');
-        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
-    },
-    filename: function (_req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    },
-});
-
-const upload = multer({ storage });
 
 // Public: read settings
 router.get('/', async (_req, res) => {
@@ -40,7 +27,7 @@ router.put(
     '/logo',
     auth,
     checkRole(['admin']),
-    upload.single('logo'),
+    uploadImage.single('logo'),
     async (req: any, res: any) => {
         try {
             const file = req.file;

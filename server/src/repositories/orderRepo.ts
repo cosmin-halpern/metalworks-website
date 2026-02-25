@@ -192,7 +192,9 @@ export async function createOrderTransactional(
 
             if (p.track_stock) {
                 if (p.stock < i.quantity) {
-                    throw new Error(`Stoc insuficient pentru produs: ${p.title}`);
+                    const err = new Error(`Stoc insuficient pentru produs: ${p.title} (cerut: ${i.quantity}, disponibil: ${p.stock})`);
+                    (err as any).code = 'INSUFFICIENT_STOCK';
+                    throw err;
                 }
                 // decrement in DB
                 await conn.query('UPDATE products SET stock = stock - ? WHERE id = ?', [
@@ -296,25 +298,48 @@ export async function createOrderTransactional(
     }
 }
 
-export async function listOrders(limit = 200): Promise<OrderDTO[]> {
+const MAX_PAGE_SIZE = 100;
+
+export type PaginatedResult<T> = {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+};
+
+export async function listOrders(
+    page = 1,
+    limit = 50
+): Promise<PaginatedResult<OrderDTO>> {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), MAX_PAGE_SIZE);
+    const offset = (safePage - 1) * safeLimit;
+
+    const [[{ total }]] = await pool.query(
+        'SELECT COUNT(*) as total FROM orders'
+    ) as any;
+
     const [rows] = await pool.query(
-        `
-            SELECT id
-            FROM orders
-            ORDER BY created_at DESC
-                LIMIT ?
-        `,
-        [limit]
+        'SELECT id FROM orders ORDER BY created_at DESC LIMIT ? OFFSET ?',
+        [safeLimit, offset]
     );
 
     const ids = (rows as Array<{ id: number }>).map((r) => r.id);
 
-    const result: OrderDTO[] = [];
+    const data: OrderDTO[] = [];
     for (const id of ids) {
         const o = await getOrderById(id);
-        if (o) result.push(o);
+        if (o) data.push(o);
     }
-    return result;
+
+    return {
+        data,
+        total: Number(total),
+        page: safePage,
+        limit: safeLimit,
+        pages: Math.ceil(Number(total) / safeLimit),
+    };
 }
 
 export async function countNewOrders(): Promise<number> {

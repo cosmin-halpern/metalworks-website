@@ -133,8 +133,8 @@ router.post('/', async (req, res) => {
                 .join('');
 
             const customerHtml = `
-        <h2>Confirmare comandă: ${escapeHtml(created.orderNumber)}</h2>
-        <p>Îți mulțumim! Comanda ta a fost înregistrată.</p>
+        <h2>Îți mulțumim pentru comandă!</h2>
+        <p>Comanda ta <b>${escapeHtml(created.orderNumber)}</b> a fost înregistrată cu succes.</p>
         <p><b>Total:</b> ${created.total} RON</p>
         <h3>Produse</h3>
         <ul>${customerHtmlItems}</ul>

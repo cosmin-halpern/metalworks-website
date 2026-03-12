@@ -70,12 +70,17 @@ const ManageOrders = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status }),
         });
+        if (!res.ok) { alert('Eroare la actualizare status'); return; }
+        await fetchOrders();
+    };
 
-        if (!res.ok) {
-            alert('Eroare la actualizare status');
-            return;
-        }
-
+    const updatePaymentStatus = async (id: number, paymentStatus: string) => {
+        const res = await apiFetch(`${API_URL}/orders/${id}/payment-status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentStatus }),
+        });
+        if (!res.ok) { alert('Eroare la actualizare status plată'); return; }
         await fetchOrders();
     };
 
@@ -113,11 +118,11 @@ const ManageOrders = () => {
                                         <p className="text-xs text-slate-500 mt-1">{o.shipping.address}</p>
                                     </div>
 
-                                    <div className="text-right shrink-0">
+                                    <div className="text-right shrink-0 flex flex-col items-end gap-2">
                                         <p className="font-bold text-slate-900">{o.total} RON</p>
 
                                         <select
-                                            className={`mt-2 border rounded p-2 text-sm font-medium ${orderStatusBadge[o.status] ?? ''}`}
+                                            className={`border rounded p-2 text-sm font-medium ${orderStatusBadge[o.status] ?? ''}`}
                                             value={o.status}
                                             onChange={(e) => updateStatus(o.id, e.target.value)}
                                         >
@@ -126,6 +131,16 @@ const ManageOrders = () => {
                                             <option value="shipped">Expediată</option>
                                             <option value="completed">Finalizată</option>
                                             <option value="cancelled">Anulată</option>
+                                        </select>
+
+                                        <select
+                                            className={`border rounded p-2 text-sm font-medium ${paymentStatusBadge[o.paymentStatus] ?? ''}`}
+                                            value={o.paymentStatus}
+                                            onChange={(e) => updatePaymentStatus(o.id, e.target.value)}
+                                        >
+                                            <option value="pending">În așteptare</option>
+                                            <option value="paid">Plătit</option>
+                                            <option value="failed">Eșuat</option>
                                         </select>
                                     </div>
                                 </div>

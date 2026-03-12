@@ -6,6 +6,7 @@ import { sendEmail } from '../services/email.js';
 import {
     countNewOrders,
     createOrderTransactional,
+    getOrderById,
     listOrders,
     updateOrderStatus,
     updatePaymentStatus,
@@ -250,6 +251,30 @@ router.put('/:id/status', auth, checkRole(['admin']), async (req, res) => {
         const updated = await updateOrderStatus(orderId, parsed.data.status as OrderStatus);
         if (!updated) return res.status(404).json({ msg: 'Order not found' });
 
+        res.json(updated);
+    } catch (err: any) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Update payment status (admin)
+router.put('/:id/payment-status', auth, checkRole(['admin']), async (req, res) => {
+    try {
+        const schema = z.object({
+            paymentStatus: z.enum(['pending', 'paid', 'failed']),
+        });
+        const parsed = schema.safeParse(req.body);
+        if (!parsed.success) return res.status(400).json({ msg: 'Invalid payment status' });
+
+        const orderId = Number(req.params.id);
+        if (!orderId || Number.isNaN(orderId)) return res.status(400).json({ msg: 'Invalid id' });
+
+        const order = await getOrderById(orderId);
+        if (!order) return res.status(404).json({ msg: 'Order not found' });
+
+        await updatePaymentStatus(order.orderNumber, parsed.data.paymentStatus as PaymentStatus);
+        const updated = await getOrderById(orderId);
         res.json(updated);
     } catch (err: any) {
         console.error(err);

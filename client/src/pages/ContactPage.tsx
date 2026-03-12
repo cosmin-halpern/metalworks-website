@@ -2,8 +2,15 @@ import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import Banner from '../components/Banner';
 import ContactForm from '../components/ContactForm';
+import { useSEO } from '../hooks/useSEO';
 
 const ContactPage = () => {
+    useSEO({
+        title: 'Contact – Corsican Engineering România',
+        description: 'Contactează Corsican Engineering pentru structuri metalice, rafturi industriale, servicii CNC și sudare. Suntem în România și răspundem rapid.',
+        canonical: 'https://www.corsican.ro/contact',
+    });
+
     const contactInfo = [
         {
             icon: Phone,

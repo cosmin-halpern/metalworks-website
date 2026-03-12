@@ -3,8 +3,15 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import CarouselBanner from '../components/CarouselBanner';
 import ClientLogosCarousel from '../components/ClientLogosCarousel';
+import { useSEO } from '../hooks/useSEO';
 
 const HomePage = () => {
+    useSEO({
+        title: 'Structuri Metalice, Construcții Metalice și Rafturi Industriale România',
+        description: 'Corsican Engineering – structuri metalice, construcții metalice, rafturi industriale, mobilier industrial, servicii CNC, instalații de țeavă și sudare în România.',
+        canonical: 'https://www.corsican.ro',
+    });
+
     const features = [
         'Instalații industriale de țeavă',
         'Structuri metalice',

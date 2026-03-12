@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSEO } from '../hooks/useSEO';
 import { motion } from 'framer-motion';
 import ServiceIcon from '../components/ServiceIcon';
 import ServiceGalleryModal from '../components/ServiceGalleryModal';
@@ -71,6 +72,12 @@ const serviceGalleries: Record<string, string[]> = {
 };
 
 const ServicesPage: React.FC = () => {
+    useSEO({
+        title: 'Servicii – CNC, Sudare, Structuri Metalice, Instalații Țeavă',
+        description: 'Servicii complete de prelucrare metalică: construcții metalice, servicii CNC, sudare, instalații industriale de țeavă și montaj în România.',
+        canonical: 'https://www.corsican.ro/servicii',
+    });
+
     const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
     const selectedService = services.find((s) => s.id === selectedServiceId);

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Banner from '../components/Banner';
 import ProjectGalleryModal from '../components/ProjectGalleryModal';
 import { getApiBaseUrl, getApiUrl } from '../services/env';
+import { useSEO } from '../hooks/useSEO';
 
 // This must match exactly what your backend returns and what ProjectGalleryModal expects
 type ProjectMedia = {
@@ -19,6 +20,11 @@ type Project = {
 };
 
 const WorkPage = () => {
+    useSEO({
+        title: 'Proiectele Noastre – Structuri și Construcții Metalice',
+        description: 'Galerie de proiecte realizate: structuri metalice, rafturi industriale, instalații de țeavă, mobilier industrial și construcții metalice în România.',
+        canonical: 'https://www.corsican.ro/proiecte',
+    });
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);

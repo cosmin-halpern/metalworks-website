@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Banner from '../components/Banner';
 import { useCart } from '../lib/cart';
 import { getApiUrl, getApiBaseUrl } from '../services/env';
+import { useSEO } from '../hooks/useSEO';
 
 type Product = {
     id: number;
@@ -14,6 +15,12 @@ type Product = {
 };
 
 const Store = () => {
+    useSEO({
+        title: 'Magazin – Rafturi Industriale și Mobilier Industrial',
+        description: 'Cumpără rafturi industriale, mobilier industrial și echipamente metalice. Produse de calitate pentru depozite și spații industriale din România.',
+        canonical: 'https://www.corsican.ro/magazin',
+    });
+
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
@@ -27,6 +28,7 @@ import ManageOrders from './pages/admin/ManageOrders';
 function App() {
     return (
         <Router>
+            <ScrollToTop />
             <Routes>
                 {/* ADMIN ROUTES (No Header/Footer) */}
                 <Route path="/admin/login" element={<Login />} />

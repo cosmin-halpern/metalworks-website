@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { type RequestHandler } from 'express';
 import { z } from 'zod';
+import Stripe from 'stripe';
 import auth, { checkRole } from '../middleware/auth.js';
 import { sendEmail } from '../services/email.js';
 import {
@@ -13,6 +14,8 @@ import {
 } from '../repositories/orderRepo.js';
 
 const router = express.Router();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const createOrderSchema = z.object({
     items: z
@@ -154,64 +157,41 @@ router.post('/', async (req, res) => {
             }).catch((e) => console.error(`[email] Customer confirmation failed for order ${created.orderNumber} to ${shipping.email}:`, e));
         }
 
-        // Netopia card payment: initiate hosted payment and return redirect URL
+        // Stripe card payment: create hosted Checkout Session and return redirect URL
         if (paymentMethod === 'card') {
             try {
-                const { Netopia } = await import('netopia-card');
-
-                const netopia = new Netopia({
-                    apiKey: process.env.NETOPIA_API_KEY,
-                    sandbox: process.env.NETOPIA_LIVE !== 'true',
-                    posSignature: process.env.NETOPIA_SIGNATURE,
-                    notifyUrl: process.env.NETOPIA_CONFIRM_URL,
-                    redirectUrl: `${process.env.NETOPIA_RETURN_URL}?order=${created.orderNumber}`,
-                    apiBaseUrl: process.env.NETOPIA_API_BASE_URL,
-                });
-
-                const nameParts = shipping.fullName.trim().split(/\s+/);
-                const firstName = nameParts[0];
-                const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
-
-                netopia.setOrderData({
-                    orderID: created.orderNumber,
-                    amount: created.total,
-                    currency: 'RON',
-                    description: `Comanda ${created.orderNumber}`,
-                    billing: {
-                        email: shipping.email,
-                        firstName,
-                        lastName,
-                        phone: shipping.phone,
-                        city: shipping.city,
-                        country: 642, // Romania
-                        countryName: 'Romania',
-                        state: '',
-                        postalCode: '',
-                        details: shipping.address,
+                const session = await stripe.checkout.sessions.create({
+                    payment_method_types: ['card'],
+                    mode: 'payment',
+                    customer_email: shipping.email,
+                    line_items: created.items.map((item) => ({
+                        price_data: {
+                            currency: 'ron',
+                            product_data: { name: item.title },
+                            unit_amount: Math.round(item.price * 100), // RON -> bani
+                        },
+                        quantity: item.quantity,
+                    })),
+                    metadata: {
+                        orderNumber: created.orderNumber,
+                        orderId: String(created.orderId),
                     },
+                    success_url: `${process.env.CLIENT_URL}/plata-finalizata?order=${created.orderNumber}`,
+                    cancel_url: `${process.env.CLIENT_URL}/cos`,
                 });
 
-                netopia.setProductsData(
-                    created.items.map((item) => ({
-                        name: item.title,
-                        code: String(item.productId),
-                        category: 'general',
-                        price: item.price,
-                        vat: 19,
-                    }))
-                );
+                // Store session ID so the webhook can match it to the order
+                await updatePaymentStatus(created.orderNumber, 'pending', session.id);
 
-                const netopiaResponse = await netopia.startPayment();
-
-                if (netopiaResponse?.paymentURL) {
+                if (session.url) {
                     return res.json({
                         orderId: created.orderId,
                         orderNumber: created.orderNumber,
-                        paymentURL: netopiaResponse.paymentURL,
+                        paymentURL: session.url,
                     });
                 }
-            } catch (netopiaErr) {
-                console.error(`[netopia] Failed to initiate payment for order ${created.orderNumber}:`, netopiaErr);
+            } catch (stripeErr) {
+                console.error(`[stripe] Failed to create session for order ${created.orderNumber}:`, stripeErr);
                 // Fall through — order is saved; customer will be shown order number
             }
         }
@@ -255,35 +235,6 @@ router.get('/new-count', auth, checkRole(['admin']), async (_req, res) => {
     }
 });
 
-// Netopia IPN (Instant Payment Notification) — no auth, called by Netopia servers
-router.post('/ipn', express.text({ type: '*/*' }), async (req, res) => {
-    try {
-        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-        const { order, payment } = body ?? {};
-
-        const orderNumber = String(order?.orderID ?? '');
-        const statusCode = Number(payment?.status ?? -1);
-        const ntfUrl = String(order?.ntfURL ?? '');
-
-        let paymentStatus: PaymentStatus = 'pending';
-        if (statusCode === 5) {
-            paymentStatus = 'paid';
-        } else if (statusCode === 3 || statusCode === 7 || statusCode === 8) {
-            paymentStatus = 'failed';
-        }
-
-        if (orderNumber) {
-            await updatePaymentStatus(orderNumber, paymentStatus, ntfUrl);
-        }
-
-        res.status(200).json({ errorCode: 0 });
-    } catch (err) {
-        console.error('[ipn] Error processing notification:', err);
-        // Always return 200 to prevent Netopia retry loops
-        res.status(200).json({ errorCode: 0 });
-    }
-});
-
 // Update status (admin)
 router.put('/:id/status', auth, checkRole(['admin']), async (req, res) => {
     try {
@@ -305,5 +256,39 @@ router.put('/:id/status', auth, checkRole(['admin']), async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+// Stripe webhook — registered BEFORE express.json() in index.ts so raw body is available
+export const stripeWebhookHandler: RequestHandler = async (req, res) => {
+    const sig = req.headers['stripe-signature'] as string;
+    let event: Stripe.Event;
+
+    try {
+        event = stripe.webhooks.constructEvent(
+            req.body as Buffer,
+            sig,
+            process.env.STRIPE_WEBHOOK_SECRET!
+        );
+    } catch (err) {
+        console.error('[stripe] Webhook signature verification failed:', err);
+        return res.status(400).send('Webhook Error');
+    }
+
+    try {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderNumber = session.metadata?.orderNumber;
+
+        if (orderNumber) {
+            if (event.type === 'checkout.session.completed') {
+                await updatePaymentStatus(orderNumber, 'paid', session.id);
+            } else if (event.type === 'checkout.session.expired') {
+                await updatePaymentStatus(orderNumber, 'failed', session.id);
+            }
+        }
+    } catch (err) {
+        console.error('[stripe] Error processing webhook event:', err);
+    }
+
+    res.json({ received: true });
+};
 
 export default router;

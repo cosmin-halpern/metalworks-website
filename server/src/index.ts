@@ -15,7 +15,7 @@ import projectRoutes from './routes/projects.js';
 import clientRoutes from './routes/clients.js';
 import productRoutes from './routes/products.js';
 import settingsRoutes from './routes/settings.js';
-import ordersRoutes from './routes/orders.js';
+import ordersRoutes, { stripeWebhookHandler } from './routes/orders.js';
 
 // Optional: DB ping endpoint (MySQL)
 import { dbPing } from './repositories/dbRepo.js';
@@ -32,11 +32,14 @@ const PORT = process.env.PORT || 5000;
 // Required for express-rate-limit to correctly read client IPs from X-Forwarded-For.
 app.set('trust proxy', 1);
 
-// 2. Comprehensive CORS for testing
+// 2. Allowed CORS origins — extend via ALLOWED_ORIGINS env var (comma-separated)
 const allowedOrigins = new Set([
     'https://test.corsican.ro',
+    'https://www.corsican.ro',
+    'https://corsican.ro',
     'http://localhost:5173',
     'http://localhost:3000',
+    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()) : []),
 ]);
 
 app.use(
@@ -57,6 +60,10 @@ app.options('*', cors());
 app.use(helmet());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(cookieParser());
+
+// Stripe webhook must receive the raw body — register BEFORE express.json()
+app.post('/api/orders/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
+
 app.use(express.json());
 
 // Fix for __dirname in ES modules

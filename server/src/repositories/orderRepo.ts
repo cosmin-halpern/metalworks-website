@@ -362,10 +362,20 @@ export async function updateOrderStatus(orderId: number, status: OrderStatus): P
 export async function updatePaymentStatus(
     orderNumber: string,
     paymentStatus: PaymentStatus,
-    ntfUrl = ''
+    stripeSessionId = ''
 ): Promise<void> {
     await pool.query(
-        'UPDATE orders SET payment_status = ?, netopia_ntf_url = ? WHERE order_number = ?',
-        [paymentStatus, ntfUrl, orderNumber]
+        'UPDATE orders SET payment_status = ?, stripe_session_id = ? WHERE order_number = ?',
+        [paymentStatus, stripeSessionId, orderNumber]
     );
+}
+
+export async function getOrderByStripeSessionId(sessionId: string): Promise<OrderDTO | null> {
+    const [rows] = await pool.query(
+        'SELECT id FROM orders WHERE stripe_session_id = ? LIMIT 1',
+        [sessionId]
+    );
+    const row = (rows as Array<{ id: number }>)[0];
+    if (!row) return null;
+    return getOrderById(row.id);
 }

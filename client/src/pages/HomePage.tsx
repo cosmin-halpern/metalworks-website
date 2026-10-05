@@ -48,30 +48,6 @@ const HomePage = () => {
         }
     ];
 
-    // @ts-ignore
-    const clientLogos = [
-        '/images/sigleClienti/sigla1.jpg',
-        '/images/sigleClienti/sigla2.png',
-        '/images/sigleClienti/sigla3.png',
-        '/images/sigleClienti/sigla4.png',
-        '/images/sigleClienti/sigla5.png',
-        '/images/sigleClienti/sigla6.png',
-        '/images/sigleClienti/sigla7.png',
-        '/images/sigleClienti/sigla8.png',
-        '/images/sigleClienti/sigla9.png',
-        '/images/sigleClienti/sigla10.png',
-        '/images/sigleClienti/sigla11.png',
-        '/images/sigleClienti/sigla12.png',
-        '/images/sigleClienti/sigla13.png',
-        '/images/sigleClienti/sigla14.png',
-        '/images/sigleClienti/sigla15.png',
-        '/images/sigleClienti/sigla16.png',
-        '/images/sigleClienti/sigla17.png',
-        '/images/sigleClienti/sigla18.png',
-        '/images/sigleClienti/sigla19.png',
-        '/images/sigleClienti/sigla20.png',
-    ];
-
     return (
         <div className="min-h-screen">
             {/* Hero Section - Carousel Banner */}

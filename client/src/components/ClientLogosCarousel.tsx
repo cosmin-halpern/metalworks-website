@@ -46,11 +46,11 @@ const ClientLogosCarousel: React.FC = () => {
                     >
                         {duplicatedLogos.map((client, index) => (
                             <div
-                                key={`${client._id}-${index}`}
+                                key={`${client.id}-${index}`}
                                 className="flex-shrink-0 w-32 h-20 md:w-40 md:h-24 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300"
                             >
                                 <img
-                                    src={`${SERVER_URL}${client.imageUrl}`}
+                                    src={`${SERVER_URL}${client.src}`}
                                     alt={client.name}
                                     className="max-w-full max-h-full object-contain"
                                 />

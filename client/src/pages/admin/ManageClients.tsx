@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {getApiUrl} from "../../services/env.ts";
+import {getApiBaseUrl, getApiUrl} from "../../services/env.ts";
 import { apiFetch } from '../../services/authService';
 
 const ManageClients = () => {
@@ -95,17 +95,17 @@ const ManageClients = () => {
                 {/* Clients Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {clients.map((client) => (
-                        <div key={client._id} className="bg-white p-4 rounded-lg shadow group relative">
+                        <div key={client.id} className="bg-white p-4 rounded-lg shadow group relative">
                             <div className="h-24 flex items-center justify-center mb-2">
                                 <img
-                                    src={`http://localhost:5001${client.imageUrl}`}
+                                    src={`${getApiBaseUrl() || window.location.origin}${client.src}`}
                                     alt={client.name}
                                     className="max-h-full max-w-full object-contain grayscale group-hover:grayscale-0 transition"
                                 />
                             </div>
                             <p className="text-center text-xs font-bold text-gray-500 truncate">{client.name}</p>
                             <button
-                                onClick={() => handleDelete(client._id)}
+                                onClick={() => handleDelete(client.id)}
                                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow-lg"
                                 title="Șterge"
                             >

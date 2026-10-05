@@ -74,17 +74,17 @@ const Footer = () => {
                             </li>
                             <li className="flex items-center space-x-3">
                                 <MapPin className="h-5 w-5 text-accent" />
-                                <span className="text-gray-300">România</span>
+                                <span className="text-gray-300">Bulevardul Eroilor 81, Voluntari, Ilfov</span>
                             </li>
                         </ul>
                         <div className="flex space-x-4 mt-6">
                             <a href="https://www.facebook.com/p/Corsican-Engineering-100064100884554/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
                                 <FaFacebook className="h-6 w-6" />
                             </a>
-                            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                            <a href="https://www.instagram.com/corsicanengineering/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-300 hover:text-white transition-colors">
                                 <Instagram className="h-6 w-6" />
                             </a>
-                            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                            <a href="https://linkedin.com/company/corsican-engineering-srl" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-gray-300 hover:text-white transition-colors">
                                 <Linkedin className="h-6 w-6" />
                             </a>
                         </div>

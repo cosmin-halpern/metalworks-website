@@ -36,10 +36,12 @@ const TopBar: React.FC<TopBarProps> = () => {
                        className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
                         <FaFacebook className="w-4 h-4"/>
                     </a>
-                    <a href="#" aria-label="Instagram" className="hover:text-white transition">
+                    <a href="https://www.instagram.com/corsicanengineering/" aria-label="Instagram"
+                       className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
                         <Instagram className="w-4 h-4"/>
                     </a>
-                    <a href="#" aria-label="LinkedIn" className="hover:text-white transition">
+                    <a href="https://linkedin.com/company/corsican-engineering-srl" aria-label="LinkedIn"
+                       className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
                         <Linkedin className="w-4 h-4"/>
                     </a>
                 </div>

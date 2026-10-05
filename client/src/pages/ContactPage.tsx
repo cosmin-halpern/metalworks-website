@@ -27,7 +27,7 @@ const ContactPage = () => {
         {
             icon: MapPin,
             title: 'Locație',
-            details: ['România'],
+            details: ['Bulevardul Eroilor 81, Voluntari, Ilfov'],
             description: 'Disponibili pentru proiecte naționale'
         }
     ];

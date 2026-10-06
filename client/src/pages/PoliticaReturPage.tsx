@@ -52,8 +52,9 @@ const PoliticaReturPage = () => {
                     </li>
                     <li>Veți primi în maxim 2 zile lucrătoare instrucțiunile de returnare</li>
                     <li>
-                        Expediați produsul la adresa indicată; costurile de retur sunt suportate de
-                        Cumpărător
+                        Expediați produsul la adresa{' '}
+                        <strong>Corsican Engineering SRL, Bulevardul Eroilor 81, Voluntari, Ilfov</strong>;
+                        costurile de retur sunt suportate de Cumpărător
                     </li>
                 </ol>
 

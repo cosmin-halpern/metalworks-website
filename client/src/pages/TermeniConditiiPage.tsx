@@ -12,9 +12,9 @@ const TermeniConditiiPage = () => {
                 <h2>1. Informații despre vânzător</h2>
                 <p>
                     Contractul de vânzare-cumpărare la distanță se încheie între dvs. (Cumpărătorul) și{' '}
-                    <strong>[COMPLETAȚI — denumire juridică completă]</strong>, cu sediul în{' '}
-                    <strong>[COMPLETAȚI — adresă sediu]</strong>, CUI <strong>[COMPLETAȚI]</strong>,
-                    nr. Reg. Com. <strong>[COMPLETAȚI — J__/__/____]</strong>, e-mail:{' '}
+                    <strong>Corsican Engineering SRL</strong>, cu sediul în{' '}
+                    <strong>Bulevardul Eroilor 81, Voluntari, Ilfov</strong>, CUI <strong>RO41397600</strong>,
+                    nr. Reg. Com. <strong>J2019003117233</strong>, e-mail:{' '}
                     <a href="mailto:office@corsican.ro">office@corsican.ro</a>, tel.:{' '}
                     <a href="tel:+40768515774">+40 768 515 774</a> (denumit în continuare „Vânzătorul").
                 </p>

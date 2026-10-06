@@ -12,14 +12,14 @@ const PoliticaConfidentialitatePage = () => {
                 <h2>1. Operatorul de date</h2>
                 <p>
                     Operatorul datelor cu caracter personal este{' '}
-                    <strong>[COMPLETAȚI — denumire juridică completă]</strong>, CUI{' '}
-                    <strong>[COMPLETAȚI]</strong>, cu sediul în{' '}
-                    <strong>[COMPLETAȚI — adresă sediu]</strong>, e-mail:{' '}
+                    <strong>Corsican Engineering SRL</strong>, CUI{' '}
+                    <strong>RO41397600</strong>, cu sediul în{' '}
+                    <strong>Bulevardul Eroilor 81, Voluntari, Ilfov</strong>, e-mail:{' '}
                     <a href="mailto:office@corsican.ro">office@corsican.ro</a>.
                 </p>
                 <p>
-                    Responsabil cu Protecția Datelor (DPO):{' '}
-                    <strong>[COMPLETAȚI — email DPO, dacă este cazul]</strong>.
+                    Pentru orice solicitare privind datele cu caracter personal, ne puteți contacta la{' '}
+                    <a href="mailto:office@corsican.ro">office@corsican.ro</a>.
                 </p>
 
                 <h2>2. Datele colectate</h2>

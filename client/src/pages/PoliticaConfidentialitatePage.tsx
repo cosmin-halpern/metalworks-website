@@ -6,7 +6,7 @@ const PoliticaConfidentialitatePage = () => {
             <Banner title="Politica de Confidențialitate" height="h-48" />
 
             <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 prose prose-slate">
-                <p className="text-sm text-gray-500 mb-8">Ultima actualizare: februarie 2026</p>
+                <p className="text-sm text-gray-500 mb-8">Ultima actualizare: octombrie 2026</p>
 
                 <h2>1. Operatorul de date</h2>
                 <p>
@@ -22,7 +22,7 @@ const PoliticaConfidentialitatePage = () => {
                 </p>
 
                 <h2>2. Datele colectate</h2>
-                <p>Colectăm exclusiv datele necesare procesării comenzilor:</p>
+                <p>Pentru procesarea comenzilor colectăm doar datele necesare:</p>
                 <ul>
                     <li>Nume și prenume</li>
                     <li>Număr de telefon</li>
@@ -40,6 +40,13 @@ const PoliticaConfidentialitatePage = () => {
                     Datele sunt prelucrate în scopul <strong>executării contractului</strong> de vânzare la
                     distanță (art. 6 alin. 1 lit. b GDPR): procesarea comenzii, livrarea produselor,
                     emiterea facturii și comunicarea cu dvs. referitor la comandă.
+                </p>
+                <p>
+                    Dacă acceptați cookie-urile de marketing, datele de navigare pe site (paginile vizitate,
+                    adresa IP, identificatorul cookie) sunt prelucrate prin Meta Pixel în scopul măsurării
+                    și personalizării reclamelor, pe baza <strong>consimțământului</strong> dvs. (art. 6
+                    alin. 1 lit. a GDPR), pe care îl puteți retrage oricând. Detalii în{' '}
+                    <a href="/politica-de-cookies">Politica de Cookies</a>.
                 </p>
 
                 <h2>4. Durata păstrării datelor</h2>
@@ -64,7 +71,12 @@ const PoliticaConfidentialitatePage = () => {
                         card online)
                     </li>
                 </ul>
-                <p>Nu vindem, închiriem sau transmitem datele dvs. altor terți.</p>
+                <p>
+                    Doar dacă ați acceptat cookie-urile de marketing, datele de navigare sunt transmise și
+                    către <strong>Meta Platforms Ireland Ltd.</strong> (Meta Pixel), care le poate transfera
+                    în afara Spațiului Economic European în baza mecanismelor prevăzute de GDPR.
+                </p>
+                <p>Nu vindem sau închiriem datele dvs. și nu le transmitem altor terți.</p>
 
                 <h2>6. Drepturile dvs.</h2>
                 <p>Conform GDPR, aveți dreptul la:</p>

@@ -69,7 +69,18 @@ app.use(
 
 app.options('*', cors());
 
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                // Meta Pixel (loaded by the client only after cookie consent)
+                'script-src': ["'self'", 'https://connect.facebook.net'],
+                'img-src': ["'self'", 'data:', 'https://www.facebook.com'],
+                'connect-src': ["'self'", 'https://www.facebook.com', 'https://connect.facebook.net'],
+            },
+        },
+    })
+);
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(cookieParser());
 

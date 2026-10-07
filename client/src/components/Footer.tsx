@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Instagram, Linkedin } from 'lucide-react';
 import { FaFacebook } from 'react-icons/fa';
+import { openConsentBanner } from '../lib/consent';
 
 const Footer = () => {
     return (
@@ -52,6 +53,15 @@ const Footer = () => {
                                 <Link to="/politica-de-cookies" className="text-gray-300 hover:text-white transition-colors">
                                     Politica de Cookies
                                 </Link>
+                            </li>
+                            <li>
+                                <button
+                                    type="button"
+                                    onClick={openConsentBanner}
+                                    className="text-gray-300 hover:text-white transition-colors"
+                                >
+                                    Setări cookie-uri
+                                </button>
                             </li>
                             <li>
                                 <Link to="/politica-de-retur" className="text-gray-300 hover:text-white transition-colors">

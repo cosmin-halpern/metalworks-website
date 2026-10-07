@@ -5,6 +5,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
+import MetaPixel from './components/MetaPixel';
 import HomePage from './pages/HomePage';
 import ContactPage from './pages/ContactPage';
 import ServicesPage from './pages/ServicesPage';
@@ -50,6 +51,7 @@ function App() {
                     <div className="flex flex-col min-h-screen">
                         <Header />
                         <CookieBanner />
+                        <MetaPixel />
                         <main className="flex-grow">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />

@@ -6,7 +6,7 @@ const PoliticaCookiesPage = () => {
             <Banner title="Politica de Cookies" height="h-48" />
 
             <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 prose prose-slate">
-                <p className="text-sm text-gray-500 mb-8">Ultima actualizare: februarie 2026</p>
+                <p className="text-sm text-gray-500 mb-8">Ultima actualizare: octombrie 2026</p>
 
                 <h2>1. Ce sunt cookie-urile?</h2>
                 <p>
@@ -27,26 +27,52 @@ const PoliticaCookiesPage = () => {
                         browserului
                     </li>
                     <li>
-                        <strong>Consimțământul cookie</strong> (<code>cookie_consent</code>) — reținem
-                        că ați vizualizat și acceptat prezenta politică
+                        <strong>Preferința privind cookie-urile</strong> (<code>cookie_consent_v2</code>) —
+                        reținem dacă ați acceptat sau refuzat cookie-urile de marketing, pentru a nu vă
+                        întreba la fiecare vizită
                     </li>
                 </ul>
 
-                <h2>3. Cookie-uri de urmărire și analiză</h2>
+                <h2>3. Cookie-uri strict necesare</h2>
                 <p>
-                    În prezent, <strong>nu folosim</strong> cookie-uri de analiză (ex. Google Analytics),
-                    cookie-uri de marketing sau cookie-uri de urmărire terțe.
+                    Stocarea locală menționată mai sus este strict necesară funcționării magazinului
+                    online și nu necesită consimțământul dvs.
                 </p>
 
-                <h2>4. Cookie-uri strict necesare</h2>
+                <h2>4. Cookie-uri de marketing (Meta Pixel)</h2>
                 <p>
-                    Stocarea locală menționată mai sus (coș de cumpărături) este strict necesară
-                    funcționării magazinului online. Fără ea, experiența de cumpărare nu poate fi asigurată.
+                    <strong>Numai dacă le acceptați</strong> din bannerul de cookie-uri, folosim Meta Pixel,
+                    un instrument furnizat de Meta Platforms Ireland Ltd. (Facebook, Instagram), pentru a
+                    măsura eficiența reclamelor noastre și pentru a afișa reclame relevante persoanelor care
+                    au vizitat site-ul. Dacă refuzați, Meta Pixel nu este încărcat.
+                </p>
+                <ul>
+                    <li>
+                        <code>_fbp</code> — identifică browserul dvs. pentru măsurarea reclamelor; durată:
+                        90 de zile
+                    </li>
+                    <li>
+                        <code>_fbc</code> — reține reclama de pe care ați ajuns pe site, dacă este cazul;
+                        durată: 90 de zile
+                    </li>
+                </ul>
+                <p>
+                    Informațiile colectate (paginile vizitate, adresa IP, tipul browserului) sunt
+                    prelucrate de Meta conform{' '}
+                    <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer">
+                        politicii sale de confidențialitate
+                    </a>
+                    . Nu folosim cookie-uri de analiză (ex. Google Analytics).
                 </p>
 
-                <h2>5. Cum puteți controla sau șterge datele stocate</h2>
+                <h2>5. Cum vă puteți retrage consimțământul sau șterge datele</h2>
                 <p>
-                    Puteți șterge oricând datele stocate local din setările browserului:
+                    Vă puteți schimba oricând alegerea din linkul <strong>„Setări cookie-uri”</strong>{' '}
+                    din subsolul paginii. Dacă retrageți consimțământul, Meta Pixel nu mai este folosit,
+                    iar cookie-urile <code>_fbp</code> și <code>_fbc</code> sunt șterse.
+                </p>
+                <p>
+                    De asemenea, puteți șterge oricând datele stocate din setările browserului:
                 </p>
                 <ul>
                     <li>

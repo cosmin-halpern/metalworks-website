@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import auth from '../middleware/auth.js';
 import { uploadImage } from '../middleware/upload.js';
+import { optimizeImages } from '../middleware/optimizeImages.js';
 import {
     createClientLogo,
     deleteClientLogoById,
@@ -37,7 +38,7 @@ router.get('/', async (_req, res) => {
 });
 
 // POST new logo (auth)
-router.post('/', auth, uploadImage.single('logo'), async (req: any, res: any) => {
+router.post('/', auth, uploadImage.single('logo'), optimizeImages, async (req: any, res: any) => {
     try {
         if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
 

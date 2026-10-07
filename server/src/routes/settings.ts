@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import auth, { checkRole } from '../middleware/auth.js';
 import { uploadImage } from '../middleware/upload.js';
+import { optimizeImages } from '../middleware/optimizeImages.js';
 import { getSettingsSingleton, updateLogoUrlSingleton } from '../repositories/siteSettingsRepo.js';
 
 const router = express.Router();
@@ -28,6 +29,7 @@ router.put(
     auth,
     checkRole(['admin']),
     uploadImage.single('logo'),
+    optimizeImages,
     async (req: any, res: any) => {
         try {
             const file = req.file;

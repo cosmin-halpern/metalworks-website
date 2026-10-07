@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import auth, { checkRole } from '../middleware/auth.js';
 import { uploadImage } from '../middleware/upload.js';
+import { optimizeImages } from '../middleware/optimizeImages.js';
 import {
     createProduct,
     deleteProductById,
@@ -53,6 +54,7 @@ router.post(
     auth,
     checkRole(['admin']),
     uploadImage.single('image'),
+    optimizeImages,
     async (req: any, res: any) => {
         try {
             const parsed = createProductSchema.safeParse(req.body);
@@ -88,6 +90,7 @@ router.put(
     auth,
     checkRole(['admin']),
     uploadImage.single('image'),
+    optimizeImages,
     async (req: any, res: any) => {
         try {
             const id = parseId(req.params.id);

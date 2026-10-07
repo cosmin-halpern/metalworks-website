@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import auth, { checkRole } from '../middleware/auth.js';
 import { uploadMedia } from '../middleware/upload.js';
+import { optimizeImages } from '../middleware/optimizeImages.js';
 import { addProjectMedia, createProject, deleteProjectById, deleteProjectMedia, getProjectById, listProjects } from '../repositories/projectRepo.js';
 
 const router = express.Router();
@@ -45,6 +46,7 @@ router.post(
         { name: 'coverImage', maxCount: 1 },
         { name: 'gallery', maxCount: 60 },
     ]),
+    optimizeImages,
     async (req: any, res: any) => {
         try {
             const parsed = createProjectSchema.safeParse(req.body);
@@ -118,6 +120,7 @@ router.post(
     '/:id/media',
     auth,
     uploadMedia.array('gallery', 60),
+    optimizeImages,
     async (req: any, res: any) => {
         try {
             const id = Number(req.params.id);

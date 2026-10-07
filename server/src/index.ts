@@ -21,6 +21,7 @@ import ordersRoutes, { stripeWebhookHandler } from './routes/orders.js';
 import { dbPing } from './repositories/dbRepo.js';
 import { runMigrations } from './db/migrate.js';
 import { renderSpaShell } from './seo.js';
+import { loadSharp } from './middleware/optimizeImages.js';
 
 dotenv.config();
 
@@ -94,8 +95,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Health Check Routes
-app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', node: process.version });
+app.get('/api/health', async (_req, res) => {
+    // imageOptimization: whether sharp loaded, i.e. uploaded images are being compressed
+    res.json({ status: 'ok', node: process.version, imageOptimization: (await loadSharp()) !== null });
 });
 
 // Optional: MySQL DB check (very useful on cPanel)

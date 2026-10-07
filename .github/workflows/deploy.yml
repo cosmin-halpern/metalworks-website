@@ -38,9 +38,25 @@ jobs:
         working-directory: server
         run: npm run build
 
+      # ── Vendor sharp ────────────────────────────────────────────────────────
+      # The hosting's cPanel no longer offers "Setup Node.js App" or a Terminal, so
+      # `npm install` can't be run on the server. sharp (native, used to compress
+      # uploaded images) is installed here as a Linux build into server/vendor and
+      # uploaded via FTP; optimizeImages.ts loads it from there. If it can't load on
+      # the host, the app still runs and uploads are stored uncompressed.
+      - name: Vendor sharp for the server
+        working-directory: server
+        run: |
+          SHARP_VERSION=$(node -p "require('./package-lock.json').packages['node_modules/sharp'].version")
+          mkdir -p vendor && cd vendor
+          npm init -y >/dev/null
+          npm install --omit=dev --no-audit --no-fund --os=linux --cpu=x64 --libc=glibc "sharp@$SHARP_VERSION"
+          node -e "require('sharp')" && echo "sharp $SHARP_VERSION vendored"
+
       # ── Warn if package.json changed ────────────────────────────────────────
-      # When this warning appears, go to cPanel → Setup Node.js App
-      # and click "Run NPM Install" after the deploy finishes.
+      # The host has no "Run NPM Install" option anymore: a new server dependency
+      # must either be pure JS already present on the server, be vendored like sharp
+      # above, or be installed by the hosting provider.
       - name: Check if server dependencies changed
         id: deps_check
         run: |
@@ -53,7 +69,7 @@ jobs:
       - name: Warn about manual NPM install step
         if: steps.deps_check.outputs.changed == 'true'
         run: |
-          echo "::warning::server/package.json changed — after this deploy, go to cPanel → Setup Node.js App and click 'Run NPM Install', then restart."
+          echo "::warning::server/package.json changed — the host can't run npm install. Make sure any new dependency is vendored (like sharp) or installed by the hosting provider."
 
       # ── Trigger Passenger restart ────────────────────────────────────────────
       # cPanel runs Node.js apps via Phusion Passenger.
@@ -79,6 +95,7 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
+            !server/vendor/node_modules/**
             **/uploads/**
             **/.env
             **/.env.*

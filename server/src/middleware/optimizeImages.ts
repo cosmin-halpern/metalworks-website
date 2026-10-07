@@ -1,28 +1,45 @@
 import fs from 'fs/promises';
+import path from 'path';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
 import { NextFunction, Request, Response } from 'express';
 
 // Compresses images right after multer saves them, keeping the same file name so
 // routes and stored paths are unaffected. Never fails an upload: on any problem the
 // original file is kept.
 //
-// sharp is a native module and must be installed on the server ("Run NPM Install" in
-// cPanel). It is loaded lazily so the app still starts, and uploads still work
-// uncompressed, if it is missing.
+// sharp is a native module. The hosting no longer lets us run `npm install`, so the
+// deploy workflow installs a Linux build of sharp into server/vendor/node_modules and
+// uploads it over FTP. It is loaded lazily: if it is missing or its binary doesn't run
+// on the server, the app still starts and uploads are stored uncompressed.
 
 const MAX_DIMENSION = 1920;
 const QUALITY = 78;
 // Keep the original unless the optimized file is at least 10% smaller
 const MIN_SAVING_RATIO = 0.9;
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// From dist/middleware (or src/middleware) up to server/vendor
+const VENDOR_DIR = path.join(__dirname, '../../vendor');
+
 type Sharp = typeof import('sharp');
 
 let sharpPromise: Promise<Sharp | null> | null = null;
 
-function loadSharp(): Promise<Sharp | null> {
+async function importSharp(): Promise<Sharp> {
+    try {
+        return (await import('sharp')).default;
+    } catch {
+        // Not in server/node_modules: try the copy uploaded by the deploy workflow
+        const requireFromVendor = createRequire(path.join(VENDOR_DIR, 'index.js'));
+        return requireFromVendor('sharp') as Sharp;
+    }
+}
+
+export function loadSharp(): Promise<Sharp | null> {
     if (!sharpPromise) {
-        sharpPromise = import('sharp')
-            .then((mod) => {
-                const sharp = mod.default;
+        sharpPromise = importSharp()
+            .then((sharp) => {
                 // Shared hosting: keep memory and CPU use low
                 sharp.cache(false);
                 sharp.concurrency(1);

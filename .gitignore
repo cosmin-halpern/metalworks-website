@@ -2,6 +2,8 @@
 node_modules/
 client/node_modules/
 server/node_modules/
+# sharp built for Linux by the deploy workflow (see deploy.yml)
+server/vendor/
 
 # Logs
 *.log

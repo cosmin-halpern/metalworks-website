@@ -20,6 +20,7 @@ import ordersRoutes, { stripeWebhookHandler } from './routes/orders.js';
 // Optional: DB ping endpoint (MySQL)
 import { dbPing } from './repositories/dbRepo.js';
 import { runMigrations } from './db/migrate.js';
+import { renderSpaShell } from './seo.js';
 
 dotenv.config();
 
@@ -31,6 +32,17 @@ const PORT = process.env.PORT || 5000;
 // Trust the first proxy (LiteSpeed/nginx reverse proxy on cPanel).
 // Required for express-rate-limit to correctly read client IPs from X-Forwarded-For.
 app.set('trust proxy', 1);
+
+// Canonical host for SEO: send corsican.ro to www.corsican.ro. API requests are left alone
+// so webhooks and payment callbacks configured with the bare domain keep working.
+app.use((req, res, next) => {
+    if (req.hostname === 'corsican.ro' && (req.method === 'GET' || req.method === 'HEAD') && !req.path.startsWith('/api')) {
+        return res.redirect(301, `https://www.corsican.ro${req.originalUrl}`);
+    }
+    // Keep the test deployment out of search results
+    if (req.hostname.startsWith('test.')) res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    next();
+});
 
 // 2. Allowed CORS origins — extend via ALLOWED_ORIGINS env var (comma-separated)
 const allowedOrigins = new Set([
@@ -108,6 +120,8 @@ const clientIndexHtml = path.join(clientDistPath, 'index.html');
 app.use(
     express.static(clientDistPath, {
         index: false,
+        // Don't add trailing slashes to folder paths; the SPA fallback below removes them
+        redirect: false,
     })
 );
 
@@ -121,7 +135,21 @@ app.get('*', (req, res, next) => {
         return res.status(500).send(`React build not found at: ${clientIndexHtml}.`);
     }
 
-    res.sendFile(clientIndexHtml);
+    // One URL per page: /contact/ -> /contact
+    if (req.path !== '/' && req.path.endsWith('/')) {
+        const query = req.originalUrl.slice(req.path.length);
+        return res.redirect(301, '/' + req.path.replace(/^\/+|\/+$/g, '') + query);
+    }
+
+    // Inject per-page title/description/canonical so crawlers see them without running JS,
+    // and answer unknown pages with a real 404
+    try {
+        const { status, html } = renderSpaShell(clientDistPath, req.path);
+        res.status(status).type('html').send(html);
+    } catch (err) {
+        console.error('SEO render failed, serving plain index.html:', err);
+        res.sendFile(clientIndexHtml);
+    }
 });
 
 // Multer error handler — must be after routes

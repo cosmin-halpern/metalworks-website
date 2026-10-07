@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
+import RouteSEO from './components/RouteSEO';
+import NotFoundPage from './pages/NotFoundPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
@@ -29,6 +31,7 @@ function App() {
     return (
         <Router>
             <ScrollToTop />
+            <RouteSEO />
             <Routes>
                 {/* ADMIN ROUTES (No Header/Footer) */}
                 <Route path="/admin/login" element={<Login />} />
@@ -62,7 +65,7 @@ function App() {
                                 <Route path="/politica-de-confidentialitate" element={<PoliticaConfidentialitatePage />} />
                                 <Route path="/politica-de-cookies" element={<PoliticaCookiesPage />} />
                                 <Route path="/politica-de-retur" element={<PoliticaReturPage />} />
-                                <Route path="*" element={<HomePage />} />
+                                <Route path="*" element={<NotFoundPage />} />
                             </Routes>
                         </main>
                         <Footer />

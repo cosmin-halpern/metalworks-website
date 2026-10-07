@@ -3,7 +3,6 @@ import Banner from '../components/Banner';
 const TermeniConditiiPage = () => {
     return (
         <div className="min-h-screen bg-white">
-            <title>Termeni și Condiții — Corsican Engineering</title>
             <Banner title="Termeni și Condiții" height="h-48" />
 
             <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 prose prose-slate">

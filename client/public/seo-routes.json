@@ -1,0 +1,67 @@
+{
+  "siteUrl": "https://www.corsican.ro",
+  "siteName": "Corsican Engineering",
+  "defaultImage": "/og-image.jpg",
+  "routes": {
+    "/": {
+      "title": "Structuri Metalice, Construcții Metalice și Rafturi Industriale România",
+      "description": "Corsican Engineering – structuri metalice, construcții metalice, rafturi industriale, mobilier industrial, servicii CNC, instalații de țeavă și sudare în România."
+    },
+    "/servicii": {
+      "title": "Servicii – CNC, Sudare, Structuri Metalice, Instalații Țeavă",
+      "description": "Servicii complete de prelucrare metalică: construcții metalice, servicii CNC, sudare, instalații industriale de țeavă și montaj în România."
+    },
+    "/proiecte": {
+      "title": "Proiectele Noastre – Structuri și Construcții Metalice",
+      "description": "Galerie de proiecte realizate: structuri metalice, rafturi industriale, instalații de țeavă, mobilier industrial și construcții metalice în România."
+    },
+    "/magazin": {
+      "title": "Magazin – Rafturi Industriale și Mobilier Industrial",
+      "description": "Cumpără rafturi industriale, mobilier industrial și echipamente metalice. Produse de calitate pentru depozite și spații industriale din România."
+    },
+    "/clienti": {
+      "title": "Clienții Noștri – Parteneri din Industrie",
+      "description": "Companii din diverse sectoare industriale care au colaborat cu Corsican Engineering pentru structuri metalice, rafturi industriale și instalații."
+    },
+    "/contact": {
+      "title": "Contact – Corsican Engineering România",
+      "description": "Contactează Corsican Engineering pentru structuri metalice, rafturi industriale, servicii CNC și sudare. Bulevardul Eroilor 81, Voluntari, Ilfov."
+    },
+    "/termeni-si-conditii": {
+      "title": "Termeni și Condiții",
+      "description": "Termenii și condițiile de vânzare ale magazinului online Corsican Engineering SRL."
+    },
+    "/politica-de-confidentialitate": {
+      "title": "Politica de Confidențialitate",
+      "description": "Cum colectează, folosește și protejează Corsican Engineering SRL datele cu caracter personal."
+    },
+    "/politica-de-cookies": {
+      "title": "Politica de Cookies",
+      "description": "Informații despre cookie-urile folosite pe site-ul Corsican Engineering."
+    },
+    "/politica-de-retur": {
+      "title": "Politica de Retur",
+      "description": "Condițiile de retur și rambursare pentru produsele cumpărate de la Corsican Engineering SRL."
+    },
+    "/cos": {
+      "title": "Coșul de cumpărături",
+      "noindex": true
+    },
+    "/checkout": {
+      "title": "Finalizare comandă",
+      "noindex": true
+    },
+    "/plata-finalizata": {
+      "title": "Plată finalizată",
+      "noindex": true
+    }
+  },
+  "admin": {
+    "title": "Administrare",
+    "noindex": true
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "noindex": true
+  }
+}

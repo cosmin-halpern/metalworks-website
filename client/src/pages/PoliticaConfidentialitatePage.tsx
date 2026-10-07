@@ -3,7 +3,6 @@ import Banner from '../components/Banner';
 const PoliticaConfidentialitatePage = () => {
     return (
         <div className="min-h-screen bg-white">
-            <title>Politica de Confidențialitate — Corsican Engineering</title>
             <Banner title="Politica de Confidențialitate" height="h-48" />
 
             <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 prose prose-slate">

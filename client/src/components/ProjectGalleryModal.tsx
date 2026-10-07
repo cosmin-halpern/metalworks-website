@@ -176,6 +176,8 @@ const ProjectGalleryModal: React.FC<ProjectGalleryModalProps> = ({
                                                     src={item.src}
                                                     alt={projectTitle}
                                                     className="h-full w-full object-cover"
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                             ) : (
                                                 <div className="h-full w-full bg-black flex items-center justify-center text-white">

@@ -42,6 +42,8 @@ const ClientsPage: React.FC = () => {
                                     src={logo}
                                     alt={`Client ${index + 1}`}
                                     className="max-w-full max-h-20 object-contain"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </motion.div>
                         ))}

@@ -114,7 +114,8 @@ const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
-app.use('/uploads', express.static(uploadsDir));
+// Uploaded files get unique timestamped names, so browsers can cache them for a long time
+app.use('/uploads', express.static(uploadsDir, { maxAge: '30d' }));
 
 // Define Routes (API)
 app.use('/api/auth', authRoutes);
@@ -133,6 +134,15 @@ app.use(
         index: false,
         // Don't add trailing slashes to folder paths; the SPA fallback below removes them
         redirect: false,
+        // Vite's /assets files have content hashes in their names, so they never change;
+        // other public files (/images, sitemap...) keep their names, so cache them briefly
+        setHeaders: (res, filePath) => {
+            const isHashedAsset = filePath.includes(`${path.sep}assets${path.sep}`);
+            res.setHeader(
+                'Cache-Control',
+                isHashedAsset ? 'public, max-age=31536000, immutable' : 'public, max-age=86400'
+            );
+        },
     })
 );
 

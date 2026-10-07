@@ -61,7 +61,7 @@ const Store = () => {
             <Banner
                 title="Magazin"
                 subtitle="Produse disponibile – adaugă rapid în coș"
-                backgroundImage="/images/banners/services-banner.png"
+                backgroundImage="/images/banners/services-banner.jpg"
             />
 
             <section className="py-16">

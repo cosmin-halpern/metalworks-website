@@ -157,6 +157,8 @@ const ServiceGalleryModal: React.FC<ServiceGalleryModalProps> = ({
                                                 src={src}
                                                 alt={serviceTitle}
                                                 className="h-full w-full object-cover"
+                                                loading="lazy"
+                                                decoding="async"
                                             />
                                             {index === currentIndex && (
                                                 <span className="absolute inset-0 ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900 pointer-events-none" />

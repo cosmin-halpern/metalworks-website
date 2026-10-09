@@ -3,9 +3,12 @@ import { motion } from 'framer-motion';
 import ServiceIcon from '../components/ServiceIcon';
 import ServiceGalleryModal from '../components/ServiceGalleryModal';
 import type { Service } from '../types';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import Banner from '../components/Banner';
+import { servicePages } from '../data/services';
 
-// 3 services only
+// The 3 stages of every project (design, fabrication, installation)
 const services: Service[] = [
     {
         id: 'proiectare',
@@ -80,13 +83,38 @@ const ServicesPage: React.FC = () => {
             {/* Page Banner */}
             <Banner
                 title="Serviciile noastre"
-                subtitle="Proiectare, execuție și montaj pentru structuri și echipamente metalice"
+                subtitle="Structuri metalice, instalații industriale de țeavă, rafturi și mobilier industrial"
                 backgroundImage="/images/banners/banner01.webp"
                 height="h-72 md:h-80"
                 backgroundColor="bg-primary-dark"
             />
 
-            {/* Services Section */}
+            {/* Service pages */}
+            <section className="pt-16 md:pt-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">Ce realizăm</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {servicePages.map((page) => (
+                            <Link
+                                key={page.slug}
+                                to={`/servicii/${page.slug}`}
+                                className="group block border border-gray-200 rounded-xl p-8 hover:shadow-xl hover:border-primary transition-all"
+                            >
+                                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                                    {page.name}
+                                </h3>
+                                <p className="text-gray-600 mb-4">{page.summary}</p>
+                                <span className="inline-flex items-center text-primary font-medium">
+                                    Detalii
+                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                </span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Project stages */}
             <section className="py-20 md:py-28">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div
@@ -95,6 +123,7 @@ const ServicesPage: React.FC = () => {
                         transition={{ duration: 0.5 }}
                         className="text-center mb-20"
                     >
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Cum lucrăm</h2>
                         {/* UPDATED CLASS: removed 'font-semibold text-lg', added 'text-gray-600 max-w-2xl mx-auto' to match ClientsPage */}
                         <p className="text-gray-600 max-w-2xl mx-auto text-lg font-medium font-sans">
                             Oferim servicii complete de proiectare, execuție și montaj pentru structuri și echipamente metalice.
@@ -113,9 +142,9 @@ const ServicesPage: React.FC = () => {
                             >
                                 <ServiceIcon iconKey={service.icon} className="h-20 w-20 mb-8" />
 
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                                <h3 className="text-2xl font-bold text-gray-900 mb-6">
                                     {service.title}
-                                </h2>
+                                </h3>
                                 <p className="text-base text-gray-600 mb-8 flex-1 leading-relaxed">
                                     {service.description}
                                 </p>

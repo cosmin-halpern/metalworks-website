@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Instagram, Linkedin } from 'lucide-react';
 import { FaFacebook } from 'react-icons/fa';
 import { openConsentBanner } from '../lib/consent';
+import { servicePages } from '../data/services';
 
 const Footer = () => {
     return (
@@ -16,7 +17,17 @@ const Footer = () => {
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-semibold mb-4">Link-uri rapide</h3>
+                        <h3 className="text-lg font-semibold mb-4">Servicii</h3>
+                        <ul className="space-y-2">
+                            {servicePages.map((service) => (
+                                <li key={service.slug}>
+                                    <Link to={`/servicii/${service.slug}`} className="text-gray-300 hover:text-white transition-colors">
+                                        {service.name}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                        <h3 className="text-lg font-semibold mt-6 mb-4">Link-uri rapide</h3>
                         <ul className="space-y-2">
                             <li>
                                 <Link to="/servicii" className="text-gray-300 hover:text-white transition-colors">

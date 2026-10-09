@@ -12,13 +12,16 @@ type ProjectGalleryModalProps = {
     onClose: () => void;
     projectTitle: string;
     media: ProjectMedia[];
+    /** Item shown first when the modal opens (default 0) */
+    initialIndex?: number;
 };
 
 const ProjectGalleryModal: React.FC<ProjectGalleryModalProps> = ({
                                                                      open,
                                                                      onClose,
                                                                      projectTitle,
-                                                                     media
+                                                                     media,
+                                                                     initialIndex = 0
                                                                  }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -37,8 +40,8 @@ const ProjectGalleryModal: React.FC<ProjectGalleryModalProps> = ({
 
     // reset index when re-opening or changing project
     useEffect(() => {
-        if (open) setCurrentIndex(0);
-    }, [open, projectTitle]);
+        if (open) setCurrentIndex(initialIndex);
+    }, [open, projectTitle, initialIndex]);
 
     // keyboard controls
     useEffect(() => {

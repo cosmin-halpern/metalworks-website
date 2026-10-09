@@ -8,8 +8,24 @@
       "description": "Corsican Engineering – structuri metalice, construcții metalice, rafturi industriale, mobilier industrial, servicii CNC, instalații de țeavă și sudare în România."
     },
     "/servicii": {
-      "title": "Servicii – CNC, Sudare, Structuri Metalice, Instalații Țeavă",
-      "description": "Servicii complete de prelucrare metalică: construcții metalice, servicii CNC, sudare, instalații industriale de țeavă și montaj în România."
+      "title": "Servicii – Structuri Metalice, Instalații de Țeavă, Rafturi și Mobilier Industrial",
+      "description": "Structuri metalice, instalații industriale de țeavă, rafturi industriale, mobilier industrial și terase metalice: proiectare, execuție și montaj. Corsican Engineering, Voluntari, Ilfov."
+    },
+    "/servicii/structuri-metalice": {
+      "title": "Structuri Metalice – Proiectare, Execuție și Montaj",
+      "description": "Structuri metalice pentru spații industriale, comerciale și logistice: proiectare, execuție și montaj cu aceeași echipă. Corsican Engineering, Voluntari, Ilfov."
+    },
+    "/servicii/instalatii-industriale-de-teava": {
+      "title": "Instalații Industriale de Țeavă – Glicol, Amoniac, CO2",
+      "description": "Montaj instalații industriale de țeavă pentru glicol, amoniac și CO2, executate de sudori cu omologări TÜV și Intertek. Corsican Engineering."
+    },
+    "/servicii/rafturi-industriale": {
+      "title": "Rafturi Industriale Metalice Personalizate",
+      "description": "Rafturi metalice personalizate pentru depozite, magazine și spații de producție, dimensionate după spațiu și încărcare. Producție și montaj Corsican Engineering."
+    },
+    "/servicii/mobilier-industrial-si-terase-metalice": {
+      "title": "Mobilier Industrial și Terase Metalice",
+      "description": "Terase metalice și mobilier în stil industrial pentru restaurante, cafenele și spații comerciale, executate la comandă de Corsican Engineering."
     },
     "/proiecte": {
       "title": "Proiectele Noastre – Structuri și Construcții Metalice",

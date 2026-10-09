@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import RouteSEO from './components/RouteSEO';
 import NotFoundPage from './pages/NotFoundPage';
+import ServiceDetailPage from './pages/ServiceDetailPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
@@ -56,6 +57,7 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/servicii" element={<ServicesPage />} />
+                                <Route path="/servicii/:slug" element={<ServiceDetailPage />} />
                                 <Route path="/proiecte" element={<WorkPage />} />
                                 <Route path="/magazin" element={<StorePage />} />
                                 <Route path="/cos" element={<CartPage />} />

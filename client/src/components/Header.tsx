@@ -20,6 +20,10 @@ const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // A section stays highlighted on its sub-pages (e.g. /servicii/structuri-metalice)
+    const isActive = (href: string) =>
+        href === '/' ? location.pathname === '/' : location.pathname === href || location.pathname.startsWith(`${href}/`);
+
     const navigation = [
         { name: 'Acasă', href: '/' },
         { name: 'Servicii', href: '/servicii' },
@@ -54,7 +58,7 @@ const Header = () => {
                                 key={item.name}
                                 to={item.href}
                                 className={`text-lg font-medium uppercase tracking-wide transition-colors duration-200 hover:text-primary ${
-                                    location.pathname === item.href
+                                    isActive(item.href)
                                         ? 'text-primary border-b-2 border-primary'
                                         : 'text-gray-600'
                                 }`}
@@ -202,7 +206,7 @@ const Header = () => {
                                     to={item.href}
                                     onClick={() => setIsOpen(false)}
                                     className={`block px-3 py-2 rounded-md text-lg font-medium uppercase tracking-wide ${
-                                        location.pathname === item.href
+                                        isActive(item.href)
                                             ? 'text-primary bg-neutral-light'
                                             : 'text-gray-600 hover:text-primary hover:bg-neutral-light'
                                     }`}

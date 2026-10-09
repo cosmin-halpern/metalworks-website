@@ -5,39 +5,45 @@ import CarouselBanner from '../components/CarouselBanner';
 import ClientLogosCarousel from '../components/ClientLogosCarousel';
 
 const HomePage = () => {
-    const features = [
-        'Instalații industriale de țeavă',
-        'Structuri metalice',
-        'Mobilier industrial',
-        'Servicii CNC',
-        'Servicii de reparații prin sudare'
+    // Items with a service page link to it
+    const features: { name: string; href?: string }[] = [
+        { name: 'Instalații industriale de țeavă', href: '/servicii/instalatii-industriale-de-teava' },
+        { name: 'Structuri metalice', href: '/servicii/structuri-metalice' },
+        { name: 'Rafturi industriale', href: '/servicii/rafturi-industriale' },
+        { name: 'Mobilier industrial', href: '/servicii/mobilier-industrial-si-terase-metalice' },
+        { name: 'Servicii CNC' },
+        { name: 'Servicii de reparații prin sudare' }
     ];
+
+    // The slide title is the page's H1, so it names what we do; the slogan is the subtitle
+    const heroTitle = 'Structuri metalice, instalații industriale și rafturi';
+    const heroSubtitle = 'Performanță și precizie în fiecare proiect metalic – de la concept la soluția finală';
 
     const heroSlides = [
         {
             image: '/images/homePageBanners/home1.jpg',
-            title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la soluția finală'
+            title: heroTitle,
+            subtitle: heroSubtitle
         },
         {
             image: '/images/homePageBanners/home2.jpg',
-            title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la soluția finală'
+            title: heroTitle,
+            subtitle: heroSubtitle
         },
         {
             image: '/images/homePageBanners/home3.jpg',
-            title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la soluția finală'
+            title: heroTitle,
+            subtitle: heroSubtitle
         },
         {
             image: '/images/homePageBanners/home4.jpg',
-            title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la soluția finală'
+            title: heroTitle,
+            subtitle: heroSubtitle
         },
         {
             image: '/images/homePageBanners/home5.jpg',
-            title: 'PERFORMANȚĂ ȘI PRECIZIE ÎN FIECARE PROIECT METALIC',
-            subtitle: 'De la concept la soluția finală'
+            title: heroTitle,
+            subtitle: heroSubtitle
         }
     ];
 
@@ -80,7 +86,7 @@ const HomePage = () => {
                     <div className="flex flex-wrap justify-center gap-8">
                         {features.map((feature, index) => (
                             <motion.div
-                                key={feature}
+                                key={feature.name}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -88,10 +94,20 @@ const HomePage = () => {
                                 // Using flex-basis to size items roughly like columns but allowing centering
                                 className="bg-neutral-light rounded-lg p-6 hover:shadow-lg transition-shadow duration-200 w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)]"
                             >
-                                <div className="flex items-center space-x-3 h-full">
-                                    <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-                                    <h3 className="text-xl font-semibold text-gray-900">{feature}</h3>
-                                </div>
+                                {feature.href ? (
+                                    <Link to={feature.href} className="group flex items-center space-x-3 h-full">
+                                        <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                                        <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors flex-1">
+                                            {feature.name}
+                                        </h3>
+                                        <ArrowRight className="h-5 w-5 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                ) : (
+                                    <div className="flex items-center space-x-3 h-full">
+                                        <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                                        <h3 className="text-xl font-semibold text-gray-900">{feature.name}</h3>
+                                    </div>
+                                )}
                             </motion.div>
                         ))}
                     </div>

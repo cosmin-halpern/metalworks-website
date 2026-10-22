@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import { getApiUrl } from '../services/env';
 import {useCart} from '../lib/cart';
+import { rememberPendingPurchase, trackPurchase } from '../lib/googleTag';
 
 type ShippingDetails = {
     fullName: string;
@@ -135,12 +136,17 @@ const CheckoutPage = () => {
 
             const data = await res.json();
 
+            const purchase = { orderNumber: String(data?.orderNumber ?? ''), total: Number(data?.total ?? total) };
+
             if (data?.paymentURL) {
+                // Reported on /plata-finalizata once the card payment succeeds
+                rememberPendingPurchase(purchase);
                 clear();
                 window.location.href = data.paymentURL;
                 return;
             }
 
+            if (purchase.orderNumber) trackPurchase(purchase);
             setOrderNumber(data?.orderNumber || null);
             clear();
         } catch (e) {

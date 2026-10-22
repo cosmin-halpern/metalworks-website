@@ -6,7 +6,7 @@ import ServiceDetailPage from './pages/ServiceDetailPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
-import MetaPixel from './components/MetaPixel';
+import Tracking from './components/Tracking';
 import HomePage from './pages/HomePage';
 import ContactPage from './pages/ContactPage';
 import ServicesPage from './pages/ServicesPage';
@@ -28,6 +28,7 @@ import ManageProjects from './pages/admin/ManageProjects';
 import ManageClients from './pages/admin/ManageClients';
 import ManageProducts from './pages/admin/ManageProducts';
 import ManageOrders from './pages/admin/ManageOrders';
+import ManageSiteSettings from './pages/admin/ManageSiteSettings';
 
 function App() {
     return (
@@ -45,6 +46,7 @@ function App() {
                     <Route path="/admin/clients" element={<ManageClients />} />
                     <Route path="/admin/products" element={<ManageProducts />} />
                     <Route path="/admin/orders" element={<ManageOrders />} />
+                    <Route path="/admin/settings" element={<ManageSiteSettings />} />
                 </Route>
 
                 {/* PUBLIC ROUTES (With Header/Footer) */}
@@ -52,7 +54,7 @@ function App() {
                     <div className="flex flex-col min-h-screen">
                         <Header />
                         <CookieBanner />
-                        <MetaPixel />
+                        <Tracking />
                         <main className="flex-grow">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />

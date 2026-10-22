@@ -39,7 +39,7 @@ const PoliticaCookiesPage = () => {
                     online și nu necesită consimțământul dvs.
                 </p>
 
-                <h2>4. Cookie-uri de marketing (Meta Pixel)</h2>
+                <h2>4. Cookie-uri de marketing și analiză (Meta Pixel, Google)</h2>
                 <p>
                     <strong>Numai dacă le acceptați</strong> din bannerul de cookie-uri, folosim Meta Pixel,
                     un instrument furnizat de Meta Platforms Ireland Ltd. (Facebook, Instagram), pentru a
@@ -62,14 +62,39 @@ const PoliticaCookiesPage = () => {
                     <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer">
                         politicii sale de confidențialitate
                     </a>
-                    . Nu folosim cookie-uri de analiză (ex. Google Analytics).
+                    .
+                </p>
+                <p>
+                    Tot <strong>numai dacă le acceptați</strong>, folosim Google Tag Manager, prin care se
+                    încarcă instrumentele Google Ads și Google Analytics, furnizate de Google Ireland
+                    Limited, pentru a măsura câte cereri de ofertă, apeluri și comenzi provin din reclamele
+                    noastre Google și cum este folosit site-ul. Dacă refuzați, aceste instrumente nu sunt
+                    încărcate.
+                </p>
+                <ul>
+                    <li>
+                        <code>_ga</code>, <code>_ga_*</code> — Google Analytics, deosebește vizitatorii și
+                        sesiunile; durată: până la 2 ani
+                    </li>
+                    <li>
+                        <code>_gcl_au</code>, <code>_gcl_aw</code> — Google Ads, reține reclama de pe care ați
+                        ajuns pe site, pentru măsurarea conversiilor; durată: 90 de zile
+                    </li>
+                </ul>
+                <p>
+                    Informațiile sunt prelucrate de Google conform{' '}
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+                        politicii sale de confidențialitate
+                    </a>
+                    .
                 </p>
 
                 <h2>5. Cum vă puteți retrage consimțământul sau șterge datele</h2>
                 <p>
                     Vă puteți schimba oricând alegerea din linkul <strong>„Setări cookie-uri”</strong>{' '}
-                    din subsolul paginii. Dacă retrageți consimțământul, Meta Pixel nu mai este folosit,
-                    iar cookie-urile <code>_fbp</code> și <code>_fbc</code> sunt șterse.
+                    din subsolul paginii. Dacă retrageți consimțământul, Meta Pixel și instrumentele Google
+                    nu mai sunt folosite, iar cookie-urile lor (<code>_fbp</code>, <code>_fbc</code>,{' '}
+                    <code>_ga</code>, <code>_gcl_*</code>) sunt șterse.
                 </p>
                 <p>
                     De asemenea, puteți șterge oricând datele stocate din setările browserului:

@@ -188,6 +188,7 @@ router.post('/', async (req, res) => {
                     return res.json({
                         orderId: created.orderId,
                         orderNumber: created.orderNumber,
+                        total: created.total,
                         paymentURL: session.url,
                     });
                 }
@@ -197,7 +198,7 @@ router.post('/', async (req, res) => {
             }
         }
 
-        res.json({ orderId: created.orderId, orderNumber: created.orderNumber });
+        res.json({ orderId: created.orderId, orderNumber: created.orderNumber, total: created.total });
     } catch (err: any) {
         console.error(err);
         if (err?.code === 'INSUFFICIENT_STOCK') {

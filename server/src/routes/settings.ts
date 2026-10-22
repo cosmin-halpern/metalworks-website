@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url';
 import auth, { checkRole } from '../middleware/auth.js';
 import { uploadImage } from '../middleware/upload.js';
 import { optimizeImages } from '../middleware/optimizeImages.js';
-import { getSettingsSingleton, updateLogoUrlSingleton } from '../repositories/siteSettingsRepo.js';
+import { z } from 'zod';
+import { getSettingsSingleton, updateGtmIdSingleton, updateLogoUrlSingleton } from '../repositories/siteSettingsRepo.js';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ const __dirname = path.dirname(__filename);
 router.get('/', async (_req, res) => {
     try {
         const settings = await getSettingsSingleton();
-        res.json({ logoUrl: settings.logoUrl || '' });
+        res.json({ logoUrl: settings.logoUrl || '', gtmId: settings.gtmId || '' });
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -58,5 +59,29 @@ router.put(
         }
     }
 );
+
+// Google Tag Manager container ID, e.g. GTM-ABC1234; empty string disables tracking
+const trackingSchema = z.object({
+    gtmId: z
+        .string()
+        .trim()
+        .toUpperCase()
+        .regex(/^(GTM-[A-Z0-9]{4,12})?$/, 'ID-ul trebuie să aibă forma GTM-XXXXXXX'),
+});
+
+// Admin: set tracking IDs
+router.put('/tracking', auth, checkRole(['admin']), async (req, res) => {
+    const parsed = trackingSchema.safeParse(req.body);
+    if (!parsed.success) {
+        return res.status(400).json({ msg: parsed.error.issues[0]?.message ?? 'Date invalide' });
+    }
+    try {
+        const updated = await updateGtmIdSingleton(parsed.data.gtmId);
+        res.json({ gtmId: updated.gtmId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
 
 export default router;

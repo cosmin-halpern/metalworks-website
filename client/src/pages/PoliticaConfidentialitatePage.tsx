@@ -31,8 +31,12 @@ const PoliticaConfidentialitatePage = () => {
                     <li>Date de facturare (dacă solicitați factură pe firmă): denumire firmă, CUI, adresă</li>
                 </ul>
                 <p>
-                    Nu colectăm date despre card bancar — plățile prin card sunt procesate direct de Netopia
-                    Payments S.A., care are propriile politici de confidențialitate.
+                    Când ne trimiteți o cerere de ofertă prin formularul de contact, colectăm datele pe
+                    care le completați: nume, telefon și/sau adresă de e-mail, serviciul dorit și mesajul.
+                </p>
+                <p>
+                    Nu colectăm date despre card bancar — plățile prin card sunt procesate direct de Stripe
+                    Payments Europe, Limited, care are propriile politici de confidențialitate.
                 </p>
 
                 <h2>3. Scopul și temeiul juridic</h2>
@@ -42,8 +46,14 @@ const PoliticaConfidentialitatePage = () => {
                     emiterea facturii și comunicarea cu dvs. referitor la comandă.
                 </p>
                 <p>
+                    Datele din formularul de contact sunt prelucrate pentru a vă răspunde și a vă trimite
+                    oferta solicitată, la cererea dvs., înainte de încheierea unui contract (art. 6 alin. 1
+                    lit. b GDPR).
+                </p>
+                <p>
                     Dacă acceptați cookie-urile de marketing, datele de navigare pe site (paginile vizitate,
-                    adresa IP, identificatorul cookie) sunt prelucrate prin Meta Pixel în scopul măsurării
+                    adresa IP, identificatorul cookie) sunt prelucrate prin Meta Pixel și instrumentele
+                    Google (Google Ads, Google Analytics) în scopul măsurării
                     și personalizării reclamelor, pe baza <strong>consimțământului</strong> dvs. (art. 6
                     alin. 1 lit. a GDPR), pe care îl puteți retrage oricând. Detalii în{' '}
                     <a href="/politica-de-cookies">Politica de Cookies</a>.
@@ -56,6 +66,11 @@ const PoliticaConfidentialitatePage = () => {
                     contabilității nr. 82/1991). La expirarea termenului, datele sunt șterse sau
                     anonimizate.
                 </p>
+                <p>
+                    Cererile de ofertă primite prin formularul de contact sunt păstrate cât timp este
+                    necesar pentru a vă răspunde și, dacă încheiem un contract, pe durata relației
+                    contractuale.
+                </p>
 
                 <h2>5. Destinatarii datelor</h2>
                 <p>
@@ -67,13 +82,14 @@ const PoliticaConfidentialitatePage = () => {
                         livrare)
                     </li>
                     <li>
-                        <strong>Netopia Payments S.A.</strong> — procesator de plăți (pentru plăți prin
-                        card online)
+                        <strong>Stripe Payments Europe, Limited</strong> — procesator de plăți (pentru plăți
+                        prin card online)
                     </li>
                 </ul>
                 <p>
                     Doar dacă ați acceptat cookie-urile de marketing, datele de navigare sunt transmise și
-                    către <strong>Meta Platforms Ireland Ltd.</strong> (Meta Pixel), care le poate transfera
+                    către <strong>Meta Platforms Ireland Ltd.</strong> (Meta Pixel) și{' '}
+                    <strong>Google Ireland Limited</strong> (Google Ads, Google Analytics), care le pot transfera
                     în afara Spațiului Economic European în baza mecanismelor prevăzute de GDPR.
                 </p>
                 <p>Nu vindem sau închiriem datele dvs. și nu le transmitem altor terți.</p>

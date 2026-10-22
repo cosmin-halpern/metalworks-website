@@ -8,19 +8,27 @@ const ContactPage = () => {
         {
             icon: Phone,
             title: 'Telefon',
-            details: ['+40 (768) 515 774', '+40 (768) 367 563'],
+            details: [
+                { label: '+40 (768) 515 774', href: 'tel:+40768515774' },
+                { label: '+40 (768) 367 563', href: 'tel:+40768367563' },
+            ],
             description: 'Luni - Vineri, 08:00 - 17:00'
         },
         {
             icon: Mail,
             title: 'Email',
-            details: ['office@corsican.ro'],
+            details: [{ label: 'office@corsican.ro', href: 'mailto:office@corsican.ro' }],
             description: 'Răspundem în maxim 24 de ore'
         },
         {
             icon: MapPin,
             title: 'Locație',
-            details: ['Bulevardul Eroilor 81, Voluntari, Ilfov'],
+            details: [
+                {
+                    label: 'Bulevardul Eroilor 81, Voluntari, Ilfov',
+                    href: 'https://www.google.com/maps/search/?api=1&query=Bulevardul+Eroilor+81+Voluntari+Ilfov',
+                },
+            ],
             description: 'Disponibili pentru proiecte naționale'
         }
     ];
@@ -56,8 +64,14 @@ const ContactPage = () => {
                                     <div>
                                         <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
                                         {item.details.map((detail) => (
-                                            <p key={detail} className="text-primary font-medium">
-                                                {detail}
+                                            <p key={detail.label}>
+                                                <a
+                                                    href={detail.href}
+                                                    className="text-primary font-medium hover:underline"
+                                                    {...(detail.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                                                >
+                                                    {detail.label}
+                                                </a>
                                             </p>
                                         ))}
                                         <p className="text-sm text-gray-500 mt-1">{item.description}</p>

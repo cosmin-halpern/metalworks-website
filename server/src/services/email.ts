@@ -6,6 +6,8 @@ export type EmailData = {
     subject: string;
     text: string;
     html?: string;
+    /** Address that "Reply" goes to, e.g. the customer who filled in a form */
+    replyTo?: string;
 };
 
 // Singleton transporter — created once and reused across calls
@@ -42,6 +44,7 @@ export const sendEmail = async (emailData: EmailData): Promise<void> => {
                 subject: emailData.subject,
                 text: emailData.text,
                 html: emailData.html,
+                replyTo: emailData.replyTo,
             });
             return;
         } catch (error) {

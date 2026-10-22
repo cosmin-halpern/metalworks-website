@@ -16,6 +16,7 @@ import clientRoutes from './routes/clients.js';
 import productRoutes from './routes/products.js';
 import settingsRoutes from './routes/settings.js';
 import ordersRoutes, { stripeWebhookHandler } from './routes/orders.js';
+import contactRoutes from './routes/contact.js';
 
 // Optional: DB ping endpoint (MySQL)
 import { dbPing } from './repositories/dbRepo.js';
@@ -73,11 +74,40 @@ app.options('*', cors());
 app.use(
     helmet({
         contentSecurityPolicy: {
+            // Meta Pixel and Google Tag Manager / Google Ads / GA4 — both loaded by the client
+            // only after cookie consent. Google domains per Google's CSP guide for Tag Manager.
             directives: {
-                // Meta Pixel (loaded by the client only after cookie consent)
-                'script-src': ["'self'", 'https://connect.facebook.net'],
-                'img-src': ["'self'", 'data:', 'https://www.facebook.com'],
-                'connect-src': ["'self'", 'https://www.facebook.com', 'https://connect.facebook.net'],
+                'script-src': [
+                    "'self'",
+                    'https://connect.facebook.net',
+                    'https://www.googletagmanager.com',
+                    'https://www.googleadservices.com',
+                    'https://googleads.g.doubleclick.net',
+                    'https://www.google.com',
+                ],
+                'img-src': [
+                    "'self'",
+                    'data:',
+                    'https://www.facebook.com',
+                    'https://www.googletagmanager.com',
+                    'https://*.google-analytics.com',
+                    'https://googleads.g.doubleclick.net',
+                    'https://www.google.com',
+                    'https://www.google.ro',
+                ],
+                'connect-src': [
+                    "'self'",
+                    'https://www.facebook.com',
+                    'https://connect.facebook.net',
+                    'https://www.googletagmanager.com',
+                    'https://*.google-analytics.com',
+                    'https://*.analytics.google.com',
+                    'https://googleads.g.doubleclick.net',
+                    'https://www.google.com',
+                    'https://www.google.ro',
+                ],
+                // Google Ads conversion tracking uses an iframe
+                'frame-src': ["'self'", 'https://td.doubleclick.net', 'https://www.googletagmanager.com'],
             },
         },
     })
@@ -126,6 +156,7 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Serve React build (client/dist)
 const clientDistPath = path.resolve(__dirname, '../../client/dist');

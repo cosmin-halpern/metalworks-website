@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { trackPendingPurchase } from '../lib/googleTag';
 
 const PlataFinalizataPage = () => {
     const [searchParams] = useSearchParams();
     const orderNumber = searchParams.get('order');
+
+    useEffect(() => {
+        trackPendingPurchase(orderNumber);
+    }, [orderNumber]);
 
     return (
         <div className="min-h-screen bg-white flex items-center justify-center">

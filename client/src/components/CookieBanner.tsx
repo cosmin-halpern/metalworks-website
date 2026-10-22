@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ConsentChoice, getConsent, onConsentBannerOpen, setConsent } from '../lib/consent';
 import { initMetaPixel, revokeMetaPixel, trackPageView } from '../lib/metaPixel';
+import { initGoogleTag, revokeGoogleTag, trackEvent } from '../lib/googleTag';
 
 const CookieBanner = () => {
     const [visible, setVisible] = useState(false);
@@ -16,8 +17,11 @@ const CookieBanner = () => {
         if (choice === 'accepted') {
             initMetaPixel();
             trackPageView();
+            void initGoogleTag();
+            trackEvent('virtual_page_view', { page_path: window.location.pathname, page_title: document.title });
         } else {
             revokeMetaPixel();
+            revokeGoogleTag();
         }
         setVisible(false);
     };
@@ -32,9 +36,9 @@ const CookieBanner = () => {
         >
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <p className="text-sm text-gray-200 flex-1">
-                    Cu acordul dvs., folosim cookie-uri de marketing (Meta Pixel) pentru a măsura
-                    eficiența reclamelor noastre pe Facebook și Instagram. Coșul de cumpărături
-                    funcționează și fără ele.{' '}
+                    Cu acordul dvs., folosim cookie-uri de marketing și de analiză (Meta Pixel,
+                    Google) pentru a măsura eficiența reclamelor noastre pe Google, Facebook și
+                    Instagram. Site-ul și coșul de cumpărături funcționează și fără ele.{' '}
                     <Link to="/politica-de-cookies" className="underline hover:text-white">
                         Aflați mai multe
                     </Link>

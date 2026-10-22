@@ -6,7 +6,7 @@ const TermeniConditiiPage = () => {
             <Banner title="Termeni și Condiții" height="h-48" />
 
             <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 prose prose-slate">
-                <p className="text-sm text-gray-500 mb-8">Ultima actualizare: februarie 2026</p>
+                <p className="text-sm text-gray-500 mb-8">Ultima actualizare: octombrie 2026</p>
 
                 <h2>1. Informații despre vânzător</h2>
                 <p>
@@ -36,7 +36,7 @@ const TermeniConditiiPage = () => {
                 <ul>
                     <li>Ramburs (numerar la livrare)</li>
                     <li>Transfer bancar</li>
-                    <li>Card bancar online (prin procesatorul de plăți Netopia Payments)</li>
+                    <li>Card bancar online (prin procesatorul de plăți Stripe)</li>
                 </ul>
 
                 <h2>4. Livrare</h2>

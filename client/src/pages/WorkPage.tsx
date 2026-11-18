@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Banner from '../components/Banner';
 import ProjectGalleryModal from '../components/ProjectGalleryModal';
 import { getApiBaseUrl, getApiUrl } from '../services/env';
+import { useInitialData } from '../lib/initialData';
 
 // This must match exactly what your backend returns and what ProjectGalleryModal expects
 type ProjectMedia = {
@@ -11,7 +12,7 @@ type ProjectMedia = {
 };
 
 type Project = {
-    _id: string;
+    id: number;
     title: string;
     description: string;
     coverImage: string;
@@ -19,16 +20,18 @@ type Project = {
 };
 
 const WorkPage = () => {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+    const initialProjects = useInitialData<Project>('projects');
+    const [projects, setProjects] = useState<Project[]>(initialProjects ?? []);
+    const [loading, setLoading] = useState(!initialProjects);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const API_URL = getApiUrl();
-    const SERVER_URL = getApiBaseUrl() || window.location.origin;
-
+    const SERVER_URL = getApiBaseUrl();
 
     useEffect(() => {
+        // Already rendered with the server's data
+        if (initialProjects) return;
         const fetchProjects = async () => {
             try {
                 const res = await fetch(`${API_URL}/projects?limit=100`);
@@ -41,7 +44,7 @@ const WorkPage = () => {
             }
         };
         fetchProjects();
-    }, [API_URL]);
+    }, [API_URL, initialProjects]);
 
     const handleOpenGallery = (project: Project) => {
         setSelectedProject(project);
@@ -75,7 +78,7 @@ const WorkPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {projects.map((project, index) => (
                             <motion.div
-                                key={project._id}
+                                key={project.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -109,8 +112,7 @@ const WorkPage = () => {
 
                     {projects.length === 0 && (
                         <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                            <p className="text-gray-500 font-medium">Momentan nu există proiecte încărcate.</p>
-                            <p className="text-sm text-gray-400 mt-1">Accesați panoul de administrare pentru a adăuga proiecte noi.</p>
+                            <p className="text-gray-500 font-medium">Momentan nu există proiecte publicate.</p>
                         </div>
                     )}
                 </div>

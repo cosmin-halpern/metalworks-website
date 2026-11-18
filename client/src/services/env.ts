@@ -11,6 +11,9 @@ export function getApiBaseUrl(): string {
         // ignore
     }
 
+    // Server-side render (server/src/ssr.ts): same-origin, relative URLs
+    if (typeof window === 'undefined') return '';
+
     // Fallback for local dev
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') {

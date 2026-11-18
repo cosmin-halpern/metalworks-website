@@ -21,7 +21,8 @@ import contactRoutes from './routes/contact.js';
 // Optional: DB ping endpoint (MySQL)
 import { dbPing } from './repositories/dbRepo.js';
 import { runMigrations } from './db/migrate.js';
-import { renderSpaShell } from './seo.js';
+import { isAdminPath, normalizePath, renderSpaShell } from './seo.js';
+import { renderApp } from './ssr.js';
 import { loadSharp } from './middleware/optimizeImages.js';
 
 dotenv.config();
@@ -161,6 +162,7 @@ app.use('/api/contact', contactRoutes);
 // Serve React build (client/dist)
 const clientDistPath = path.resolve(__dirname, '../../client/dist');
 const clientIndexHtml = path.join(clientDistPath, 'index.html');
+const clientServerEntry = path.resolve(__dirname, '../../client/dist-server/entry-server.js');
 
 app.use(
     express.static(clientDistPath, {
@@ -180,7 +182,7 @@ app.use(
 );
 
 // SPA fallback (React Router) - keep AFTER /api routes
-app.get('*', (req, res, next) => {
+app.get('*', async (req, res, next) => {
     if (req.path.startsWith('/api')) return next();
     if (req.path.startsWith('/assets')) return next();
     if (path.extname(req.path)) return next();
@@ -195,10 +197,11 @@ app.get('*', (req, res, next) => {
         return res.redirect(301, '/' + req.path.replace(/^\/+|\/+$/g, '') + query);
     }
 
-    // Inject per-page title/description/canonical so crawlers see them without running JS,
-    // and answer unknown pages with a real 404
+    // Inject per-page title/description/canonical and the rendered page so crawlers see them
+    // without running JS, and answer unknown pages with a real 404. Admin pages render in the browser.
     try {
-        const { status, html } = renderSpaShell(clientDistPath, req.path);
+        const app = isAdminPath(req.path) ? null : await renderApp(clientServerEntry, req.originalUrl, normalizePath(req.path));
+        const { status, html } = renderSpaShell(clientDistPath, req.path, app);
         res.status(status).type('html').send(html);
     } catch (err) {
         console.error('SEO render failed, serving plain index.html:', err);

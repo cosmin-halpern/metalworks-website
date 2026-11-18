@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import RouteSEO from './components/RouteSEO';
 import NotFoundPage from './pages/NotFoundPage';
@@ -30,9 +30,10 @@ import ManageProducts from './pages/admin/ManageProducts';
 import ManageOrders from './pages/admin/ManageOrders';
 import ManageSiteSettings from './pages/admin/ManageSiteSettings';
 
+// The router is provided by the entry point: BrowserRouter in main.tsx, StaticRouter in entry-server.tsx
 function App() {
     return (
-        <Router>
+        <>
             <ScrollToTop />
             <RouteSEO />
             <Routes>
@@ -78,7 +79,7 @@ function App() {
                     </div>
                 } />
             </Routes>
-        </Router>
+        </>
     );
 }
 

@@ -22,4 +22,5 @@ client/.env
 # Build outputs — both are compiled by CI (GitHub Actions) and deployed via FTP.
 # Do not commit generated files; the source is the truth.
 client/dist/
+client/dist-server/
 server/dist/

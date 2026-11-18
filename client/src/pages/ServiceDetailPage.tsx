@@ -6,6 +6,7 @@ import ProjectGalleryModal from '../components/ProjectGalleryModal';
 import NotFoundPage from './NotFoundPage';
 import { findServicePage, servicePages } from '../data/services';
 import { getApiBaseUrl, getApiUrl } from '../services/env';
+import { useInitialData } from '../lib/initialData';
 
 type ProjectMedia = { type: 'image' | 'video'; src: string };
 type Project = { id: number; title: string; coverImage: string; media: ProjectMedia[] };
@@ -23,15 +24,23 @@ const ServiceDetailPage = () => {
     const { slug } = useParams();
     const service = findServicePage(slug);
 
-    const [projects, setProjects] = useState<Project[]>([]);
+    const initialProjects = useInitialData<Project>('projects');
+    const [projects, setProjects] = useState<Project[]>(() =>
+        service && initialProjects ? initialProjects.filter((p) => service.projectIds.includes(p.id)) : []
+    );
     const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
 
     const API_URL = getApiUrl();
-    const SERVER_URL = getApiBaseUrl() || window.location.origin;
+    const SERVER_URL = getApiBaseUrl();
     const fullUrl = (src: string) => (src.startsWith('http') ? src : `${SERVER_URL}${src}`);
 
     useEffect(() => {
         if (!service) return;
+        // The server already sent the projects with the page
+        if (initialProjects) {
+            setProjects(initialProjects.filter((p) => service.projectIds.includes(p.id)));
+            return;
+        }
         setProjects([]);
         fetch(`${API_URL}/projects?limit=100`)
             .then((res) => res.json())
@@ -40,7 +49,7 @@ const ServiceDetailPage = () => {
                 setProjects(all.filter((p) => service.projectIds.includes(p.id)));
             })
             .catch((err) => console.error('Failed to load service photos:', err));
-    }, [API_URL, service]);
+    }, [API_URL, service, initialProjects]);
 
     if (!service) return <NotFoundPage />;
 

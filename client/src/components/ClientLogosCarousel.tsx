@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {getApiBaseUrl, getApiUrl} from "../services/env.ts";
 import { clientLogos } from '../data/clientLogos';
+import { useInitialData } from '../lib/initialData';
 
 type Logo = { key: string; src: string; alt: string };
 
@@ -11,30 +12,36 @@ const staticLogos: Logo[] = clientLogos.map(({ src, name }) => ({
     alt: name,
 }));
 
-const ClientLogosCarousel: React.FC = () => {
-    const [uploadedLogos, setUploadedLogos] = useState<Logo[]>([]);
+type UploadedClient = { id: number; name: string; src: string };
 
+const toLogos = (clients: UploadedClient[], serverUrl: string): Logo[] =>
+    clients.map((client) => ({
+        key: `uploaded-${client.id}`,
+        src: `${serverUrl}${client.src}`,
+        alt: client.name,
+    }));
+
+const ClientLogosCarousel: React.FC = () => {
     const API_URL = getApiUrl();
-    const SERVER_URL = getApiBaseUrl() || window.location.origin;
+    const SERVER_URL = getApiBaseUrl();
+
+    const initialClients = useInitialData<UploadedClient>('clientLogos');
+    const [uploadedLogos, setUploadedLogos] = useState<Logo[]>(() => toLogos(initialClients ?? [], SERVER_URL));
 
     useEffect(() => {
+        // Already rendered with the server's data
+        if (initialClients) return;
         const fetchLogos = async () => {
             try {
                 const res = await fetch(`${API_URL}/clients`);
-                const data = await res.json();
-                setUploadedLogos(
-                    data.map((client: any) => ({
-                        key: `uploaded-${client.id}`,
-                        src: `${SERVER_URL}${client.src}`,
-                        alt: client.name,
-                    }))
-                );
+                const data: UploadedClient[] = await res.json();
+                setUploadedLogos(toLogos(data, SERVER_URL));
             } catch (err) {
                 console.error('Failed to load client logos');
             }
         };
         fetchLogos();
-    }, [API_URL, SERVER_URL]);
+    }, [API_URL, SERVER_URL, initialClients]);
 
     const logos = [...staticLogos, ...uploadedLogos];
     if (logos.length === 0) return null;

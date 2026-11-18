@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import type { RenderedApp } from './ssr.js';
 
 // Per-route SEO for the SPA shell. The route table lives in client/public/seo-routes.json
 // (copied to client/dist on build) and is shared with the client (client/src/seo/seo.ts),
@@ -23,6 +24,7 @@ type SeoConfig = {
 };
 
 const SEO_BLOCK = /<!--seo:start-->[\s\S]*?<!--seo:end-->/;
+const EMPTY_ROOT = '<div id="root"></div>';
 
 function escapeHtml(value: string): string {
     return value
@@ -67,7 +69,16 @@ export function normalizePath(pathname: string): string {
     return trimmed === '' ? '/' : trimmed;
 }
 
-export function renderSpaShell(clientDistPath: string, pathname: string): { status: number; html: string } {
+export function isAdminPath(pathname: string): boolean {
+    const routePath = normalizePath(pathname);
+    return routePath === '/admin' || routePath.startsWith('/admin/');
+}
+
+export function renderSpaShell(
+    clientDistPath: string,
+    pathname: string,
+    app: RenderedApp | null = null
+): { status: number; html: string } {
     // Read on every request: both files are tiny, and this picks up a new build without a restart
     const html = fs.readFileSync(path.join(clientDistPath, 'index.html'), 'utf8');
     const config: SeoConfig = JSON.parse(
@@ -75,7 +86,7 @@ export function renderSpaShell(clientDistPath: string, pathname: string): { stat
     );
 
     const routePath = normalizePath(pathname);
-    const isAdmin = routePath === '/admin' || routePath.startsWith('/admin/');
+    const isAdmin = isAdminPath(routePath);
     const known = routePath in config.routes;
     const meta = config.routes[routePath] ?? (isAdmin ? config.admin : config.notFound);
 
@@ -97,8 +108,20 @@ export function renderSpaShell(clientDistPath: string, pathname: string): { stat
     <meta property="og:image" content="${image}" />${known ? serviceJsonLd(config, routePath, meta) : ''}
     <!--seo:end-->`;
 
+    let page = html.replace(SEO_BLOCK, () => block);
+    if (app) {
+        // The data goes next to #root, not inside it, so React hydrates exactly the rendered markup.
+        // Escaping "<" keeps the JSON from closing the script tag.
+        const data = JSON.stringify(app.data).replace(/</g, '\\u003c');
+        page = page.replace(
+            EMPTY_ROOT,
+            () =>
+                `<div id="root">${app.html}</div>\n<script type="application/json" id="initial-data">${data}</script>`
+        );
+    }
+
     return {
         status: known || isAdmin ? 200 : 404,
-        html: html.replace(SEO_BLOCK, () => block),
+        html: page,
     };
 }

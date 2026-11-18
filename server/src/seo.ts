@@ -5,7 +5,13 @@ import path from 'path';
 // (copied to client/dist on build) and is shared with the client (client/src/seo/seo.ts),
 // which applies the same tags on client-side navigation.
 
-type RouteMeta = { title: string; description?: string; noindex?: boolean };
+type RouteMeta = {
+    title: string;
+    description?: string;
+    noindex?: boolean;
+    // Service pages also get Service + BreadcrumbList structured data
+    service?: { name: string; serviceType: string };
+};
 
 type SeoConfig = {
     siteUrl: string;
@@ -24,6 +30,36 @@ function escapeHtml(value: string): string {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+}
+
+// JSON inside <script> must not be able to close the tag
+function jsonLd(data: object): string {
+    return `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
+}
+
+function serviceJsonLd(config: SeoConfig, routePath: string, meta: RouteMeta): string {
+    if (!meta.service) return '';
+    const url = config.siteUrl + routePath;
+    return `
+    ${jsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: meta.service.name,
+        serviceType: meta.service.serviceType,
+        description: meta.description,
+        url,
+        provider: { '@id': `${config.siteUrl}/#business` },
+        areaServed: { '@type': 'Country', name: 'România' },
+    })}
+    ${jsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Acasă', item: `${config.siteUrl}/` },
+            { '@type': 'ListItem', position: 2, name: 'Servicii', item: `${config.siteUrl}/servicii` },
+            { '@type': 'ListItem', position: 3, name: meta.service.name, item: url },
+        ],
+    })}`;
 }
 
 export function normalizePath(pathname: string): string {
@@ -45,7 +81,8 @@ export function renderSpaShell(clientDistPath: string, pathname: string): { stat
 
     const title = escapeHtml(`${meta.title} | ${config.siteName}`);
     const description = escapeHtml(meta.description ?? config.routes['/'].description ?? '');
-    const canonical = escapeHtml(config.siteUrl + (known && routePath !== '/' ? routePath : '/'));
+    // Only real pages get a canonical URL; a 404 or admin page shouldn't point at the homepage
+    const canonical = known ? escapeHtml(config.siteUrl + (routePath !== '/' ? routePath : '/')) : '';
     const image = escapeHtml(config.siteUrl + config.defaultImage);
     const robots = meta.noindex ? 'noindex, follow' : 'index, follow';
 
@@ -53,11 +90,11 @@ export function renderSpaShell(clientDistPath: string, pathname: string): { stat
     <title>${title}</title>
     <meta name="description" content="${description}" />
     <meta name="robots" content="${robots}" />
-    <link rel="canonical" href="${canonical}" />
+    ${canonical ? `<link rel="canonical" href="${canonical}" />` : ''}
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
-    <meta property="og:url" content="${canonical}" />
-    <meta property="og:image" content="${image}" />
+    ${canonical ? `<meta property="og:url" content="${canonical}" />` : ''}
+    <meta property="og:image" content="${image}" />${known ? serviceJsonLd(config, routePath, meta) : ''}
     <!--seo:end-->`;
 
     return {

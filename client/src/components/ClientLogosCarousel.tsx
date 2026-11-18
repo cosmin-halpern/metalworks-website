@@ -5,10 +5,10 @@ import { clientLogos } from '../data/clientLogos';
 
 type Logo = { key: string; src: string; alt: string };
 
-const staticLogos: Logo[] = clientLogos.map((src, index) => ({
+const staticLogos: Logo[] = clientLogos.map(({ src, name }) => ({
     key: src,
     src,
-    alt: `Client ${index + 1}`,
+    alt: name,
 }));
 
 const ClientLogosCarousel: React.FC = () => {
@@ -62,18 +62,25 @@ const ClientLogosCarousel: React.FC = () => {
                             ease: 'linear'
                         }}
                     >
-                        {duplicatedLogos.map((logo, index) => (
-                            <div
-                                key={`${logo.key}-${index}`}
-                                className="flex-shrink-0 w-32 h-20 md:w-40 md:h-24 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300"
-                            >
-                                <img
-                                    src={logo.src}
-                                    alt={logo.alt}
-                                    className="max-w-full max-h-full object-contain"
-                                />
-                            </div>
-                        ))}
+                        {duplicatedLogos.map((logo, index) => {
+                            // Only the first set is announced; the two copies exist just for the loop
+                            const isCopy = index >= logos.length;
+                            return (
+                                <div
+                                    key={`${logo.key}-${index}`}
+                                    aria-hidden={isCopy || undefined}
+                                    className="flex-shrink-0 w-32 h-20 md:w-40 md:h-24 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300"
+                                >
+                                    <img
+                                        src={logo.src}
+                                        alt={isCopy ? '' : logo.alt}
+                                        className="max-w-full max-h-full object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                            );
+                        })}
                     </motion.div>
                 </div>
             </div>

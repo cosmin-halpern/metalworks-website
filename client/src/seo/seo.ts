@@ -12,7 +12,8 @@ type RouteMeta = {
 export type ResolvedSeo = {
     title: string;
     description: string;
-    canonical: string;
+    // null on 404 and admin pages, which have no canonical URL
+    canonical: string | null;
     image: string;
     robots: string;
 };
@@ -33,7 +34,7 @@ export function resolveSeo(pathname: string): ResolvedSeo {
     return {
         title: `${meta.title} | ${seoConfig.siteName}`,
         description: meta.description ?? routes['/'].description!,
-        canonical: seoConfig.siteUrl + (known && path !== '/' ? path : '/'),
+        canonical: known ? seoConfig.siteUrl + (path !== '/' ? path : '/') : null,
         image: seoConfig.siteUrl + seoConfig.defaultImage,
         robots: meta.noindex ? 'noindex, follow' : 'index, follow',
     };
@@ -43,13 +44,29 @@ function setAttr(selector: string, attr: string, value: string) {
     document.head.querySelector(selector)?.setAttribute(attr, value);
 }
 
+// Adds the tag if the server left it out (404 page), or removes it when value is null
+function setOrRemove(tag: 'link' | 'meta', key: [string, string], attr: string, value: string | null) {
+    const selector = `${tag}[${key[0]}="${key[1]}"]`;
+    let el = document.head.querySelector(selector);
+    if (value === null) {
+        el?.remove();
+        return;
+    }
+    if (!el) {
+        el = document.createElement(tag);
+        el.setAttribute(key[0], key[1]);
+        document.head.appendChild(el);
+    }
+    el.setAttribute(attr, value);
+}
+
 export function applySeo(seo: ResolvedSeo) {
     document.title = seo.title;
     setAttr('meta[name="description"]', 'content', seo.description);
     setAttr('meta[name="robots"]', 'content', seo.robots);
-    setAttr('link[rel="canonical"]', 'href', seo.canonical);
+    setOrRemove('link', ['rel', 'canonical'], 'href', seo.canonical);
     setAttr('meta[property="og:title"]', 'content', seo.title);
     setAttr('meta[property="og:description"]', 'content', seo.description);
-    setAttr('meta[property="og:url"]', 'content', seo.canonical);
+    setOrRemove('meta', ['property', 'og:url'], 'content', seo.canonical);
     setAttr('meta[property="og:image"]', 'content', seo.image);
 }

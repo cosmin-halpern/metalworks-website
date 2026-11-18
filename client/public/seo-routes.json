@@ -8,24 +8,40 @@
       "description": "Corsican Engineering – structuri metalice, construcții metalice, rafturi industriale, mobilier industrial, servicii CNC, instalații de țeavă și sudare în România."
     },
     "/servicii": {
-      "title": "Servicii – Structuri Metalice, Instalații de Țeavă, Rafturi și Mobilier Industrial",
+      "title": "Servicii Construcții Metalice și Rafturi",
       "description": "Structuri metalice, instalații industriale de țeavă, rafturi industriale, mobilier industrial și terase metalice: proiectare, execuție și montaj. Corsican Engineering, Voluntari, Ilfov."
     },
     "/servicii/structuri-metalice": {
       "title": "Structuri Metalice – Proiectare, Execuție și Montaj",
-      "description": "Structuri metalice pentru spații industriale, comerciale și logistice: proiectare, execuție și montaj cu aceeași echipă. Corsican Engineering, Voluntari, Ilfov."
+      "description": "Structuri metalice pentru spații industriale, comerciale și logistice: proiectare, execuție și montaj cu aceeași echipă. Corsican Engineering, Voluntari, Ilfov.",
+      "service": {
+        "name": "Structuri metalice",
+        "serviceType": "Proiectare, execuție și montaj structuri metalice"
+      }
     },
     "/servicii/instalatii-industriale-de-teava": {
       "title": "Instalații Industriale de Țeavă – Glicol, Amoniac, CO2",
-      "description": "Montaj instalații industriale de țeavă pentru glicol, amoniac și CO2, executate de sudori cu omologări TÜV și Intertek. Corsican Engineering."
+      "description": "Montaj instalații industriale de țeavă pentru glicol, amoniac și CO2, executate de sudori cu omologări TÜV și Intertek. Corsican Engineering.",
+      "service": {
+        "name": "Instalații industriale de țeavă",
+        "serviceType": "Execuție și montaj instalații de țeavă din inox și oțel"
+      }
     },
     "/servicii/rafturi-industriale": {
       "title": "Rafturi Industriale Metalice Personalizate",
-      "description": "Rafturi metalice personalizate pentru depozite, magazine și spații de producție, dimensionate după spațiu și încărcare. Producție și montaj Corsican Engineering."
+      "description": "Rafturi metalice personalizate pentru depozite, magazine și spații de producție, dimensionate după spațiu și încărcare. Producție și montaj Corsican Engineering.",
+      "service": {
+        "name": "Rafturi industriale",
+        "serviceType": "Producție și montaj rafturi metalice"
+      }
     },
     "/servicii/mobilier-industrial-si-terase-metalice": {
       "title": "Mobilier Industrial și Terase Metalice",
-      "description": "Terase metalice și mobilier în stil industrial pentru restaurante, cafenele și spații comerciale, executate la comandă de Corsican Engineering."
+      "description": "Terase metalice și mobilier în stil industrial pentru restaurante, cafenele și spații comerciale, executate la comandă de Corsican Engineering.",
+      "service": {
+        "name": "Mobilier industrial și terase metalice",
+        "serviceType": "Execuție mobilier industrial și terase metalice"
+      }
     },
     "/proiecte": {
       "title": "Proiectele Noastre – Structuri și Construcții Metalice",
@@ -33,14 +49,15 @@
     },
     "/magazin": {
       "title": "Magazin – Rafturi Industriale și Mobilier Industrial",
-      "description": "Cumpără rafturi industriale, mobilier industrial și echipamente metalice. Produse de calitate pentru depozite și spații industriale din România."
+      "description": "Cumpără rafturi industriale, mobilier industrial și echipamente metalice. Produse de calitate pentru depozite și spații industriale din România.",
+      "noindex": true
     },
     "/clienti": {
       "title": "Clienții Noștri – Parteneri din Industrie",
       "description": "Companii din diverse sectoare industriale care au colaborat cu Corsican Engineering pentru structuri metalice, rafturi industriale și instalații."
     },
     "/contact": {
-      "title": "Contact – Corsican Engineering România",
+      "title": "Contact și Cerere de Ofertă",
       "description": "Contactează Corsican Engineering pentru structuri metalice, rafturi industriale, servicii CNC și sudare. Bulevardul Eroilor 81, Voluntari, Ilfov."
     },
     "/termeni-si-conditii": {

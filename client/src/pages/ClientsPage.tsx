@@ -31,7 +31,7 @@ const ClientsPage: React.FC = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
                         {clientLogos.map((logo, index) => (
                             <motion.div
-                                key={logo}
+                                key={logo.src}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
@@ -39,8 +39,8 @@ const ClientsPage: React.FC = () => {
                                 className="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-center hover:shadow-lg transition-shadow duration-200"
                             >
                                 <img
-                                    src={logo}
-                                    alt={`Client ${index + 1}`}
+                                    src={logo.src}
+                                    alt={logo.name}
                                     className="max-w-full max-h-20 object-contain"
                                     loading="lazy"
                                     decoding="async"

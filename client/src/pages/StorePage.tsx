@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Banner from '../components/Banner';
 import { useCart } from '../lib/cart';
 import { getApiUrl, getApiBaseUrl } from '../services/env';
@@ -131,9 +132,13 @@ const Store = () => {
 
                     {products.length === 0 && (
                         <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                            <p className="text-gray-500 font-medium">Momentan nu există produse încărcate.</p>
+                            <p className="text-gray-500 font-medium">Momentan nu sunt produse disponibile online.</p>
                             <p className="text-sm text-gray-400 mt-1">
-                                Accesați panoul de administrare pentru a adăuga produse noi.
+                                Pentru rafturi sau mobilier industrial la comandă,{' '}
+                                <Link to="/contact" className="font-semibold text-gray-600 hover:underline">
+                                    cereți o ofertă
+                                </Link>
+                                .
                             </p>
                         </div>
                     )}

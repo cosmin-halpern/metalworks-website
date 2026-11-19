@@ -89,6 +89,17 @@ const PoliticaCookiesPage = () => {
                     .
                 </p>
 
+                <h3>Harta de pe pagina de contact (Google Maps)</h3>
+                <p>
+                    Harta din pagina <strong>Contact</strong> se încarcă numai dacă apăsați „Afișează harta”.
+                    Abia atunci browserul se conectează la Google Maps, care poate seta propriile cookie-uri,
+                    conform{' '}
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+                        politicii de confidențialitate Google
+                    </a>
+                    . Până la apăsare, nu se trimite nimic către Google.
+                </p>
+
                 <h2>5. Cum vă puteți retrage consimțământul sau șterge datele</h2>
                 <p>
                     Vă puteți schimba oricând alegerea din linkul <strong>„Setări cookie-uri”</strong>{' '}

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import Banner from '../components/Banner';
 import ContactForm from '../components/ContactForm';
+import ContactMap from '../components/ContactMap';
 
 const ContactPage = () => {
     const contactInfo = [
@@ -85,6 +86,8 @@ const ContactPage = () => {
                             <ContactForm />
                         </div>
                     </div>
+
+                    <ContactMap />
                 </div>
             </section>
         </div>

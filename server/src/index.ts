@@ -107,8 +107,14 @@ app.use(
                     'https://www.google.com',
                     'https://www.google.ro',
                 ],
-                // Google Ads conversion tracking uses an iframe
-                'frame-src': ["'self'", 'https://td.doubleclick.net', 'https://www.googletagmanager.com'],
+                // Google Ads conversion tracking uses an iframe; www.google.com is the contact page's
+                // Google Maps embed (loaded only on click)
+                'frame-src': [
+                    "'self'",
+                    'https://td.doubleclick.net',
+                    'https://www.googletagmanager.com',
+                    'https://www.google.com',
+                ],
             },
         },
     })

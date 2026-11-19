@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,7 +7,7 @@
         /* Changed bg-background to bg-white or bg-neutral-light */
         /* Changed text-text to text-gray-900 or text-primary-dark */
         @apply bg-white text-gray-900 min-h-screen;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter Variable', sans-serif;
     }
 }
 

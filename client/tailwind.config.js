@@ -8,7 +8,7 @@ export default {
         extend: {
             fontFamily: {
                 // Set Oswald as the default sans font
-                sans: ['Oswald', 'sans-serif'],
+                sans: ['Oswald Variable', 'sans-serif'],
             },
             colors: {
                 background: '#ffffff',

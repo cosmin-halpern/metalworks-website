@@ -1,6 +1,9 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+// Self-hosted fonts (bundled by Vite) instead of Google Fonts, which blocked rendering
+import '@fontsource-variable/inter';
+import '@fontsource-variable/oswald';
 import './index.css';
 import { CartProvider } from './lib/cart';
 import { InitialDataProvider, readInitialData } from './lib/initialData';

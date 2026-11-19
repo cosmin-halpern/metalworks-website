@@ -111,3 +111,18 @@ jobs:
             client/.vite/**
             docker-compose.yml
             **/*.md
+
+      # ── IndexNow ────────────────────────────────────────────────────────────
+      # Tells Bing (which ChatGPT Search and Copilot draw on), Yandex and other IndexNow engines
+      # that the pages changed, instead of waiting for them to recrawl. The key is public by
+      # design: it must match client/public/65bd69a21ff54447cea28368c1bccfcd.txt, served at the site root.
+      # A failure here never fails the deploy.
+      - name: Notify search engines (IndexNow)
+        continue-on-error: true
+        run: |
+          KEY=65bd69a21ff54447cea28368c1bccfcd
+          URLS=$(grep -o '<loc>[^<]*</loc>' client/public/sitemap.xml | sed -e 's#<loc>##' -e 's#</loc>##' | jq -R . | jq -s .)
+          jq -n --arg key "$KEY" --argjson urls "$URLS" \
+            '{host: "www.corsican.ro", key: $key, keyLocation: "https://www.corsican.ro/\($key).txt", urlList: $urls}' > indexnow.json
+          curl -sS -o /dev/null -w "IndexNow: HTTP %{http_code}\n" -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' --data @indexnow.json

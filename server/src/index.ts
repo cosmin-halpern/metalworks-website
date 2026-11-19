@@ -175,13 +175,19 @@ app.use(
         index: false,
         // Don't add trailing slashes to folder paths; the SPA fallback below removes them
         redirect: false,
-        // Vite's /assets files have content hashes in their names, so they never change;
-        // other public files (/images, sitemap...) keep their names, so cache them briefly
+        // Vite's /assets files have content hashes in their names, so they never change.
+        // Images keep their names but rarely change: 30 days. Text files crawlers read
+        // (sitemap.xml, robots.txt, llms.txt, seo-routes.json): 1 day, so edits show up quickly.
         setHeaders: (res, filePath) => {
             const isHashedAsset = filePath.includes(`${path.sep}assets${path.sep}`);
+            const isImage = /\.(jpe?g|png|webp|gif|svg|ico|avif)$/i.test(filePath);
             res.setHeader(
                 'Cache-Control',
-                isHashedAsset ? 'public, max-age=31536000, immutable' : 'public, max-age=86400'
+                isHashedAsset
+                    ? 'public, max-age=31536000, immutable'
+                    : isImage
+                      ? 'public, max-age=2592000'
+                      : 'public, max-age=86400'
             );
         },
     })

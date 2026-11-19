@@ -21,12 +21,16 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
                                                            cta
                                                        }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    // The first slide arrives in the server-rendered HTML and must be visible right away
+    // (it's the page's largest element), so only later slides animate in
+    const [hasAdvanced, setHasAdvanced] = useState(false);
 
     useEffect(() => {
         if (slides.length <= 1) return;
 
         const id = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % slides.length);
+            setHasAdvanced(true);
         }, autoPlayIntervalMs);
 
         return () => clearInterval(id);
@@ -38,7 +42,7 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
         <section className={`relative w-full ${height} overflow-hidden bg-primary-dark font-sans`}>
             {/* Background images */}
             <div className="absolute inset-0">
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={currentSlide.image}
                         initial={{ opacity: 0, scale: 1.05 }}
@@ -61,7 +65,7 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
                 <div className="max-w-4xl">
                     <motion.h1
                         key={currentSlide.title}
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={hasAdvanced ? { opacity: 0, y: 30 } : false}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                         // Removed 'leading-tight'/'leading-normal' class
@@ -75,7 +79,7 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
                     {currentSlide.subtitle && (
                         <motion.p
                             key={currentSlide.subtitle}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={hasAdvanced ? { opacity: 0, y: 20 } : false}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.15 }}
                             className="text-xl md:text-2xl text-gray-100 mb-8 font-light tracking-wide uppercase"
@@ -85,13 +89,7 @@ const CarouselBanner: React.FC<CarouselBannerProps> = ({
                     )}
 
                     {cta && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.25 }}
-                        >
-                            {cta}
-                        </motion.div>
+                        <div>{cta}</div>
                     )}
                 </div>
             </div>

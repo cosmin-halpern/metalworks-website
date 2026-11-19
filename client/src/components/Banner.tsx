@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 interface BannerProps {
     title: string;
@@ -31,38 +30,21 @@ const Banner: React.FC<BannerProps> = ({
                 </div>
             )}
 
-            {/* Content */}
+            {/* Content: rendered visible (no fade-in) — the title is the page's largest element in the
+                server HTML, and hiding it until JavaScript loads would delay what visitors see first */}
             <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 lg:px-8">
-                <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    // Reduced sizes: text-3xl -> text-2xl, sm:text-4xl -> sm:text-3xl, etc.
-                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 max-w-4xl uppercase tracking-wider"
-                >
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 max-w-4xl uppercase tracking-wider">
                     {title}
-                </motion.h1>
+                </h1>
 
                 {subtitle && (
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        // Reduced sizes: text-lg -> text-base, sm:text-xl -> sm:text-lg
-                        className="text-base sm:text-lg text-gray-200 max-w-2xl mb-8 font-light tracking-wide"
-                    >
+                    <p className="text-base sm:text-lg text-gray-200 max-w-2xl mb-8 font-light tracking-wide">
                         {subtitle}
-                    </motion.p>
+                    </p>
                 )}
 
                 {children && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                    >
-                        {children}
-                    </motion.div>
+                    <div>{children}</div>
                 )}
             </div>
         </div>

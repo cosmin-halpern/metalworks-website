@@ -21,6 +21,7 @@ const HomePage = () => {
 
     const heroSlides = [
         {
+            // Preloaded by the server: keep "preloadImage" for "/" in public/seo-routes.json in sync
             image: '/images/homePageBanners/home1.webp',
             title: heroTitle,
             subtitle: heroSubtitle

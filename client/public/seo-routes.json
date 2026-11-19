@@ -6,6 +6,7 @@
     "/": {
       "title": "Corsican Engineering – Structuri Metalice, Instalații, Rafturi, Mobilier",
       "noSuffix": true,
+      "preloadImage": "/images/homePageBanners/home1.webp",
       "description": "Structuri metalice, rafturi industriale, mobilier industrial, servicii CNC, instalații de țeavă și sudare în România. Corsican Engineering, Voluntari, Ilfov."
     },
     "/servicii": {

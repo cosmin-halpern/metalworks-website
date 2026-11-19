@@ -12,6 +12,8 @@ type RouteMeta = {
     noindex?: boolean;
     // The title already names the brand, so " | siteName" isn't appended
     noSuffix?: boolean;
+    // Largest image above the fold (a CSS background the browser would find late), fetched early
+    preloadImage?: string;
     // Service pages also get Service + BreadcrumbList structured data
     service?: { name: string; serviceType: string };
 };
@@ -107,7 +109,11 @@ export function renderSpaShell(
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     ${canonical ? `<meta property="og:url" content="${canonical}" />` : ''}
-    <meta property="og:image" content="${image}" />${known ? serviceJsonLd(config, routePath, meta) : ''}
+    <meta property="og:image" content="${image}" />${
+        known && meta.preloadImage
+            ? `\n    <link rel="preload" as="image" href="${escapeHtml(meta.preloadImage)}" fetchpriority="high" />`
+            : ''
+    }${known ? serviceJsonLd(config, routePath, meta) : ''}
     <!--seo:end-->`;
 
     let page = html.replace(SEO_BLOCK, () => block);

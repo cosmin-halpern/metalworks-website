@@ -21,27 +21,27 @@ const HomePage = () => {
 
     const heroSlides = [
         {
-            image: '/images/homePageBanners/home1.jpg',
+            image: '/images/homePageBanners/home1.webp',
             title: heroTitle,
             subtitle: heroSubtitle
         },
         {
-            image: '/images/homePageBanners/home2.jpg',
+            image: '/images/homePageBanners/home2.webp',
             title: heroTitle,
             subtitle: heroSubtitle
         },
         {
-            image: '/images/homePageBanners/home3.jpg',
+            image: '/images/homePageBanners/home3.webp',
             title: heroTitle,
             subtitle: heroSubtitle
         },
         {
-            image: '/images/homePageBanners/home4.jpg',
+            image: '/images/homePageBanners/home4.webp',
             title: heroTitle,
             subtitle: heroSubtitle
         },
         {
-            image: '/images/homePageBanners/home5.jpg',
+            image: '/images/homePageBanners/home5.webp',
             title: heroTitle,
             subtitle: heroSubtitle
         }

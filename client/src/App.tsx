@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import RouteSEO from './components/RouteSEO';
 import NotFoundPage from './pages/NotFoundPage';
@@ -20,15 +21,18 @@ import TermeniConditiiPage from './pages/TermeniConditiiPage';
 import PoliticaConfidentialitatePage from './pages/PoliticaConfidentialitatePage';
 import PoliticaCookiesPage from './pages/PoliticaCookiesPage';
 import PoliticaReturPage from './pages/PoliticaReturPage';
-import Login from './pages/admin/Login';
-import CreateUser from './pages/admin/CreateUser';
 import ProtectedRoute from './pages/admin/ProtectedRoute';
-import AdminDashboard from './pages/admin/Dashboard';
-import ManageProjects from './pages/admin/ManageProjects';
-import ManageClients from './pages/admin/ManageClients';
-import ManageProducts from './pages/admin/ManageProducts';
-import ManageOrders from './pages/admin/ManageOrders';
-import ManageSiteSettings from './pages/admin/ManageSiteSettings';
+
+// Admin pages load in separate chunks, so public visitors don't download them.
+// They are never rendered on the server (see server/src/index.ts).
+const Login = lazy(() => import('./pages/admin/Login'));
+const CreateUser = lazy(() => import('./pages/admin/CreateUser'));
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const ManageProjects = lazy(() => import('./pages/admin/ManageProjects'));
+const ManageClients = lazy(() => import('./pages/admin/ManageClients'));
+const ManageProducts = lazy(() => import('./pages/admin/ManageProducts'));
+const ManageOrders = lazy(() => import('./pages/admin/ManageOrders'));
+const ManageSiteSettings = lazy(() => import('./pages/admin/ManageSiteSettings'));
 
 // The router is provided by the entry point: BrowserRouter in main.tsx, StaticRouter in entry-server.tsx
 function App() {
@@ -38,16 +42,18 @@ function App() {
             <RouteSEO />
             <Routes>
                 {/* ADMIN ROUTES (No Header/Footer) */}
-                <Route path="/admin/login" element={<Login />} />
+                <Route element={<Suspense fallback={null}><Outlet /></Suspense>}>
+                    <Route path="/admin/login" element={<Login />} />
 
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/admin/users" element={<CreateUser />} />
-                    <Route path="/admin/projects" element={<ManageProjects />} />
-                    <Route path="/admin/clients" element={<ManageClients />} />
-                    <Route path="/admin/products" element={<ManageProducts />} />
-                    <Route path="/admin/orders" element={<ManageOrders />} />
-                    <Route path="/admin/settings" element={<ManageSiteSettings />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/admin/users" element={<CreateUser />} />
+                        <Route path="/admin/projects" element={<ManageProjects />} />
+                        <Route path="/admin/clients" element={<ManageClients />} />
+                        <Route path="/admin/products" element={<ManageProducts />} />
+                        <Route path="/admin/orders" element={<ManageOrders />} />
+                        <Route path="/admin/settings" element={<ManageSiteSettings />} />
+                    </Route>
                 </Route>
 
                 {/* PUBLIC ROUTES (With Header/Footer) */}

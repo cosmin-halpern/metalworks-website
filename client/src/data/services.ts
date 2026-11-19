@@ -60,8 +60,7 @@ export const servicePages: ServicePage[] = [
             'Producem rafturi metalice personalizate pentru depozite, magazine și spații de producție. ' +
                 'Le dimensionăm după spațiul disponibil, după greutatea și tipul mărfii, ca să folosiți cât ' +
                 'mai bine fiecare metru pătrat.',
-            'Pe lângă rafturile din oferta magazinului online, realizăm și variante la comandă, adaptate ' +
-                'fluxului de lucru din spațiul dumneavoastră.',
+            'Realizăm rafturi la comandă, adaptate fluxului de lucru din spațiul dumneavoastră.',
         ],
         includes: [
             'Rafturi metalice la dimensiuni personalizate',

@@ -88,6 +88,8 @@ const WorkPage = () => {
                                     <img
                                         src={getFullUrl(project.coverImage)}
                                         alt={project.title}
+                                        width={800}
+                                        height={600}
                                         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                                         loading="lazy"
                                         decoding="async"

@@ -130,6 +130,8 @@ const ServiceDetailPage = () => {
                                 <img
                                     src={item.src}
                                     alt={`${service.name} – proiect realizat de Corsican Engineering`}
+                                    width={400}
+                                    height={400}
                                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     loading="lazy"
                                     decoding="async"

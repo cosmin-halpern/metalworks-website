@@ -41,6 +41,8 @@ const ClientsPage: React.FC = () => {
                                 <img
                                     src={logo.src}
                                     alt={logo.name}
+                                    width={160}
+                                    height={80}
                                     className="max-w-full max-h-20 object-contain"
                                     loading="lazy"
                                     decoding="async"

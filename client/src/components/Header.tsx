@@ -48,6 +48,8 @@ const Header = () => {
                         <img
                             src="/logo.jpeg"
                             alt="Corsican Engineering Logo"
+                            width={167}
+                            height={84}
                             className={`transition-all duration-300 ${scrolled ? 'h-12' : 'h-16'} w-auto object-contain`}
                         />
                     </Link>

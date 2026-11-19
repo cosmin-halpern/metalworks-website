@@ -81,6 +81,8 @@ const ClientLogosCarousel: React.FC = () => {
                                     <img
                                         src={logo.src}
                                         alt={isCopy ? '' : logo.alt}
+                                        width={160}
+                                        height={96}
                                         className="max-w-full max-h-full object-contain"
                                         loading="lazy"
                                         decoding="async"

@@ -5,6 +5,7 @@ import { initMetaPixel, trackPageView } from '../lib/metaPixel';
 import { initGoogleTag, trackEvent } from '../lib/googleTag';
 
 // Marketing tags (Meta Pixel, Google Tag Manager), only for visitors who accepted cookies.
+// Meta Pixel events: PageView on every route change, Lead when the quote form is sent.
 //
 // dataLayer events available in GTM for the ads setup:
 //   virtual_page_view  every route change (SPA)       page_path, page_title

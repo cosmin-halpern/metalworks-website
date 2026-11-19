@@ -54,6 +54,11 @@ export function trackPageView() {
     if (initialized) window.fbq?.('track', 'PageView');
 }
 
+// Quote request sent from the contact form; lets Meta ads optimize for leads
+export function trackLead(service: string) {
+    if (initialized) window.fbq?.('track', 'Lead', { content_name: service });
+}
+
 // Called when the visitor withdraws consent: stop sending events and remove Meta's first-party cookies
 export function revokeMetaPixel() {
     if (initialized) window.fbq?.('consent', 'revoke');

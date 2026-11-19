@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { getApiUrl } from '../services/env';
 import { servicePages } from '../data/services';
 import { trackEvent } from '../lib/googleTag';
+import { trackLead } from '../lib/metaPixel';
 
 const OTHER_SERVICE = 'Alt serviciu';
 
@@ -62,6 +63,7 @@ const ContactForm = () => {
                 return;
             }
             trackEvent('generate_lead', { form: 'contact', service: form.service || OTHER_SERVICE });
+            trackLead(form.service || OTHER_SERVICE);
             setStatus('success');
         } catch {
             setStatus('error');

@@ -7,6 +7,8 @@ type RouteMeta = {
     title: string;
     description?: string;
     noindex?: boolean;
+    // The title already names the brand, so " | siteName" isn't appended
+    noSuffix?: boolean;
 };
 
 export type ResolvedSeo = {
@@ -32,7 +34,7 @@ export function resolveSeo(pathname: string): ResolvedSeo {
     const known = path in routes;
 
     return {
-        title: `${meta.title} | ${seoConfig.siteName}`,
+        title: meta.noSuffix ? meta.title : `${meta.title} | ${seoConfig.siteName}`,
         description: meta.description ?? routes['/'].description!,
         canonical: known ? seoConfig.siteUrl + (path !== '/' ? path : '/') : null,
         image: seoConfig.siteUrl + seoConfig.defaultImage,

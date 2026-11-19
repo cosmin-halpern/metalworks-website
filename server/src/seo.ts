@@ -10,6 +10,8 @@ type RouteMeta = {
     title: string;
     description?: string;
     noindex?: boolean;
+    // The title already names the brand, so " | siteName" isn't appended
+    noSuffix?: boolean;
     // Service pages also get Service + BreadcrumbList structured data
     service?: { name: string; serviceType: string };
 };
@@ -90,7 +92,7 @@ export function renderSpaShell(
     const known = routePath in config.routes;
     const meta = config.routes[routePath] ?? (isAdmin ? config.admin : config.notFound);
 
-    const title = escapeHtml(`${meta.title} | ${config.siteName}`);
+    const title = escapeHtml(meta.noSuffix ? meta.title : `${meta.title} | ${config.siteName}`);
     const description = escapeHtml(meta.description ?? config.routes['/'].description ?? '');
     // Only real pages get a canonical URL; a 404 or admin page shouldn't point at the homepage
     const canonical = known ? escapeHtml(config.siteUrl + (routePath !== '/' ? routePath : '/')) : '';

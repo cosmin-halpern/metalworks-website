@@ -4,7 +4,8 @@
   "defaultImage": "/og-image.jpg",
   "routes": {
     "/": {
-      "title": "Structuri Metalice, Construcții Metalice și Rafturi Industriale România",
+      "title": "Corsican Engineering – Structuri Metalice, Instalații, Rafturi, Mobilier",
+      "noSuffix": true,
       "description": "Corsican Engineering – structuri metalice, construcții metalice, rafturi industriale, mobilier industrial, servicii CNC, instalații de țeavă și sudare în România."
     },
     "/servicii": {

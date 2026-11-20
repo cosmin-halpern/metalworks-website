@@ -42,6 +42,23 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- -----------------------------------------------------------------------------
+-- product_media (extra images and PDF attachments; image_url is the main image)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS product_media (
+    id         BIGINT UNSIGNED       NOT NULL AUTO_INCREMENT,
+    product_id BIGINT UNSIGNED       NOT NULL,
+    type       ENUM('image','file')  NOT NULL,
+    src        VARCHAR(1024)         NOT NULL,
+    name       VARCHAR(255)          NOT NULL DEFAULT '',
+    sort_order INT                   NOT NULL DEFAULT 0,
+    created_at TIMESTAMP             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_product_media_product (product_id, sort_order),
+    CONSTRAINT fk_product_media_product
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- -----------------------------------------------------------------------------
 -- client_logos
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS client_logos (

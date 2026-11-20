@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Images, FileText } from 'lucide-react';
 import Banner from '../components/Banner';
+import ProductDetailsModal from '../components/ProductDetailsModal';
 import { useCart } from '../lib/cart';
 import { getApiUrl, getApiBaseUrl } from '../services/env';
 
@@ -12,12 +14,15 @@ type Product = {
     price: number;
     priceOnRequest?: boolean; // no price shown, "Cere ofertă" instead of "Adaugă în coș"
     imageUrl: string; // "/uploads/..."
+    images?: { id: number; src: string }[]; // extra images after imageUrl
+    attachments?: { id: number; src: string; name: string }[]; // PDFs
     active: boolean;
 };
 
 const Store = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selected, setSelected] = useState<Product | null>(null);
 
     const { addItem, items } = useCart();
 
@@ -51,6 +56,14 @@ const Store = () => {
 
     const quoteUrl = (p: Product) => `/contact?produs=${encodeURIComponent(p.title)}`;
 
+    const addToCart = (p: Product) =>
+        addItem({
+            productId: String(p.id),
+            title: p.title,
+            price: p.price,
+            imageUrl: getFullUrl(p.imageUrl),
+        });
+
 
     if (loading) {
         return (
@@ -83,6 +96,8 @@ const Store = () => {
                         {products.map((p, index) => {
                             const productId = String(p.id);
                             const inCart = isInCart(productId);
+                            const imageCount = 1 + (p.images?.length ?? 0);
+                            const fileCount = p.attachments?.length ?? 0;
 
                             return (
                                 <motion.div
@@ -100,10 +115,14 @@ const Store = () => {
                                             loading="lazy"
                                         />
 
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <div
+                                            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                                            onClick={() => setSelected(p)}
+                                        >
                                             {p.priceOnRequest ? (
                                                 <Link
                                                     to={quoteUrl(p)}
+                                                    onClick={(e) => e.stopPropagation()}
                                                     className="bg-white text-gray-900 px-6 py-2 rounded-full font-bold shadow-lg hover:bg-gray-100"
                                                 >
                                                     Cere ofertă
@@ -111,14 +130,10 @@ const Store = () => {
                                             ) : (
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    addItem({
-                                                        productId,
-                                                        title: p.title,
-                                                        price: p.price,
-                                                        imageUrl: getFullUrl(p.imageUrl),
-                                                    })
-                                                }
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    addToCart(p);
+                                                }}
                                                 className="bg-white text-gray-900 px-6 py-2 rounded-full font-bold shadow-lg hover:bg-gray-100"
                                             >
                                                 {inCart ? 'Adaugă încă unul' : 'Adaugă în coș'}
@@ -148,6 +163,28 @@ const Store = () => {
                                             <p className="text-gray-600 line-clamp-3 text-sm">{p.description}</p>
                                         ) : null}
                                     </div>
+
+                                    <div className="px-6 pb-5 flex items-center justify-between gap-4 text-sm">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSelected(p)}
+                                            className="font-semibold text-primary hover:underline"
+                                        >
+                                            Vezi detalii
+                                        </button>
+                                        <div className="flex items-center gap-3 text-gray-500">
+                                            {imageCount > 1 && (
+                                                <span className="flex items-center gap-1" title={`${imageCount} imagini`}>
+                                                    <Images className="h-4 w-4" /> {imageCount}
+                                                </span>
+                                            )}
+                                            {fileCount > 0 && (
+                                                <span className="flex items-center gap-1" title={`${fileCount} documente PDF`}>
+                                                    <FileText className="h-4 w-4" /> {fileCount} PDF
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
                                 </motion.div>
                             );
                         })}
@@ -167,6 +204,23 @@ const Store = () => {
                     )}
                 </div>
             </section>
+
+            {selected && (
+                <ProductDetailsModal
+                    product={{
+                        title: selected.title,
+                        description: selected.description,
+                        price: selected.price,
+                        priceOnRequest: selected.priceOnRequest,
+                        images: [selected.imageUrl, ...(selected.images ?? []).map((m) => m.src)].map(getFullUrl),
+                        attachments: (selected.attachments ?? []).map((f) => ({ src: getFullUrl(f.src), name: f.name })),
+                    }}
+                    onClose={() => setSelected(null)}
+                    quoteUrl={quoteUrl(selected)}
+                    inCart={isInCart(String(selected.id))}
+                    onAddToCart={() => addToCart(selected)}
+                />
+            )}
         </div>
     );
 };

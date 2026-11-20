@@ -12,6 +12,9 @@ export type ProductRow = {
     updated_at: string | null;
 };
 
+export type ProductImage = { id: number; src: string };
+export type ProductAttachment = { id: number; src: string; name: string };
+
 export type ProductDTO = {
     id: number;
     title: string;
@@ -19,12 +22,24 @@ export type ProductDTO = {
     price: number;
     priceOnRequest: boolean; // shown as "Cere ofertă" instead of the price, not sold online
     imageUrl: string;
+    /** Extra images, after the main imageUrl */
+    images: ProductImage[];
+    /** PDF files (data sheets, drawings) */
+    attachments: ProductAttachment[];
     active: boolean;
     createdAt: string;
     updatedAt: string | null;
 };
 
-function toDTO(row: ProductRow): ProductDTO {
+type ProductMediaRow = {
+    id: number;
+    product_id: number;
+    type: 'image' | 'file';
+    src: string;
+    name: string;
+};
+
+function toDTO(row: ProductRow, media: ProductMediaRow[] = []): ProductDTO {
     return {
         id: row.id,
         title: row.title,
@@ -32,10 +47,33 @@ function toDTO(row: ProductRow): ProductDTO {
         price: Number(row.price),
         priceOnRequest: Boolean(row.price_on_request),
         imageUrl: row.image_url,
+        images: media.filter((m) => m.type === 'image').map((m) => ({ id: m.id, src: m.src })),
+        attachments: media
+            .filter((m) => m.type === 'file')
+            .map((m) => ({ id: m.id, src: m.src, name: m.name })),
         active: Boolean(row.active),
         createdAt: row.created_at,
         updatedAt: row.updated_at,
     };
+}
+
+// One query for the media of all listed products
+async function withMedia(rows: ProductRow[]): Promise<ProductDTO[]> {
+    if (rows.length === 0) return [];
+    const [mediaRows] = await pool.query(
+        `SELECT id, product_id, type, src, name
+         FROM product_media
+         WHERE product_id IN (?)
+         ORDER BY sort_order ASC, id ASC`,
+        [rows.map((r) => r.id)]
+    );
+    const byProduct = new Map<number, ProductMediaRow[]>();
+    for (const m of mediaRows as ProductMediaRow[]) {
+        const list = byProduct.get(Number(m.product_id)) ?? [];
+        list.push(m);
+        byProduct.set(Number(m.product_id), list);
+    }
+    return rows.map((r) => toDTO(r, byProduct.get(Number(r.id))));
 }
 
 export async function listActiveProducts(): Promise<ProductDTO[]> {
@@ -46,7 +84,7 @@ export async function listActiveProducts(): Promise<ProductDTO[]> {
          ORDER BY created_at DESC
          LIMIT 100`
     );
-    return (rows as ProductRow[]).map(toDTO);
+    return withMedia(rows as ProductRow[]);
 }
 
 // Admin list: inactive products too, so they can be edited and switched back on
@@ -56,7 +94,7 @@ export async function listAllProducts(): Promise<ProductDTO[]> {
          FROM products
          ORDER BY created_at DESC`
     );
-    return (rows as ProductRow[]).map(toDTO);
+    return withMedia(rows as ProductRow[]);
 }
 
 export async function findActiveProductByTitle(title: string): Promise<ProductDTO | null> {
@@ -68,7 +106,7 @@ export async function findActiveProductByTitle(title: string): Promise<ProductDT
         [title]
     );
     const row = (rows as ProductRow[])[0];
-    return row ? toDTO(row) : null;
+    return row ? (await withMedia([row]))[0] : null;
 }
 
 export async function getProductById(id: number): Promise<ProductDTO | null> {
@@ -82,7 +120,7 @@ export async function getProductById(id: number): Promise<ProductDTO | null> {
         [id]
     );
     const row = (rows as ProductRow[])[0];
-    return row ? toDTO(row) : null;
+    return row ? (await withMedia([row]))[0] : null;
 }
 
 export async function createProduct(input: {
@@ -148,4 +186,33 @@ export async function deleteProductById(id: number): Promise<ProductDTO | null> 
 
     await pool.query('DELETE FROM products WHERE id = ?', [id]);
     return existing;
+}
+
+export type NewProductMedia = { type: 'image' | 'file'; src: string; name?: string };
+
+// Appends after the product's current last item
+export async function addProductMedia(productId: number, media: NewProductMedia[]): Promise<void> {
+    if (media.length === 0) return;
+    const [rows] = await pool.query(
+        'SELECT COALESCE(MAX(sort_order), -1) AS maxOrder FROM product_media WHERE product_id = ?',
+        [productId]
+    );
+    const start = Number((rows as { maxOrder: number }[])[0]?.maxOrder ?? -1) + 1;
+    await pool.query('INSERT INTO product_media (product_id, type, src, name, sort_order) VALUES ?', [
+        media.map((m, i) => [productId, m.type, m.src, m.name ?? '', start + i]),
+    ]);
+}
+
+export async function deleteProductMedia(
+    mediaId: number,
+    productId: number
+): Promise<{ src: string } | null> {
+    const [rows] = await pool.query('SELECT src FROM product_media WHERE id = ? AND product_id = ? LIMIT 1', [
+        mediaId,
+        productId,
+    ]);
+    const row = (rows as { src: string }[])[0];
+    if (!row) return null;
+    await pool.query('DELETE FROM product_media WHERE id = ?', [mediaId]);
+    return row;
 }

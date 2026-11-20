@@ -4,14 +4,18 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import auth, { checkRole } from '../middleware/auth.js';
-import { uploadImage } from '../middleware/upload.js';
+import { originalFileName, uploadProductFiles } from '../middleware/upload.js';
 import { optimizeImages } from '../middleware/optimizeImages.js';
 import {
+    addProductMedia,
     createProduct,
     deleteProductById,
+    deleteProductMedia,
+    getProductById,
     listActiveProducts,
     listAllProducts,
     updateProduct,
+    type NewProductMedia,
 } from '../repositories/productRepo.js';
 
 const router = express.Router();
@@ -36,6 +40,29 @@ const updateProductSchema = z.object({
     priceOnRequest: formBoolean.optional(),
     active: formBoolean.optional(),
 });
+
+type UploadedFiles = Partial<Record<'image' | 'gallery' | 'attachments', Express.Multer.File[]>>;
+
+// Extra images ("gallery") and PDFs ("attachments") sent with a create or update
+function uploadedMedia(files: UploadedFiles | undefined): NewProductMedia[] {
+    return [
+        ...(files?.gallery ?? []).map((f) => ({ type: 'image' as const, src: `/uploads/${f.filename}` })),
+        ...(files?.attachments ?? []).map((f) => ({
+            type: 'file' as const,
+            src: `/uploads/${f.filename}`,
+            name: originalFileName(f),
+        })),
+    ];
+}
+
+function removeUpload(src: string) {
+    try {
+        const abs = path.join(__dirname, '../../', src.replace(/^\//, ''));
+        if (fs.existsSync(abs)) fs.unlinkSync(abs);
+    } catch {
+        // ignore
+    }
+}
 
 function parseId(idParam: string): number | null {
     const id = Number(idParam);
@@ -69,7 +96,7 @@ router.post(
     '/',
     auth,
     checkRole(['admin']),
-    uploadImage.single('image'),
+    uploadProductFiles,
     optimizeImages,
     async (req: any, res: any) => {
         try {
@@ -81,7 +108,8 @@ router.post(
                 });
             }
 
-            const imageFile = req.file;
+            const files = req.files as UploadedFiles | undefined;
+            const imageFile = files?.image?.[0];
             if (!imageFile) return res.status(400).json({ msg: 'Image is required' });
 
             const imageUrl = `/uploads/${imageFile.filename}`;
@@ -91,8 +119,9 @@ router.post(
                 imageUrl,
                 active: true,
             });
+            await addProductMedia(created.id, uploadedMedia(files));
 
-            res.json(created);
+            res.json(await getProductById(created.id));
         } catch (err: any) {
             console.error(err);
             res.status(500).send('Server Error');
@@ -105,7 +134,7 @@ router.put(
     '/:id',
     auth,
     checkRole(['admin']),
-    uploadImage.single('image'),
+    uploadProductFiles,
     optimizeImages,
     async (req: any, res: any) => {
         try {
@@ -122,15 +151,22 @@ router.put(
 
             const patch: any = { ...parsed.data };
 
-            // replace image if new file uploaded
-            if (req.file) {
-                patch.imageUrl = `/uploads/${req.file.filename}`;
+            // replace the main image if a new one was uploaded
+            const files = req.files as UploadedFiles | undefined;
+            const newImage = files?.image?.[0];
+            if (newImage) {
+                patch.imageUrl = `/uploads/${newImage.filename}`;
             }
 
+            const previous = await getProductById(id);
             const updated = await updateProduct(id, patch);
             if (!updated) return res.status(404).json({ msg: 'Product not found' });
+            if (newImage && previous && previous.imageUrl !== updated.imageUrl) removeUpload(previous.imageUrl);
 
-            res.json(updated);
+            // new gallery images / PDFs are added to the existing ones
+            await addProductMedia(id, uploadedMedia(files));
+
+            res.json(await getProductById(id));
         } catch (err: any) {
             console.error(err);
             res.status(500).send('Server Error');
@@ -147,15 +183,30 @@ router.delete('/:id', auth, checkRole(['admin']), async (req: any, res: any) => 
         const deleted = await deleteProductById(id);
         if (!deleted) return res.status(404).json({ msg: 'Product not found' });
 
-        // best-effort delete image file
-        try {
-            const abs = path.join(__dirname, '../../', deleted.imageUrl.replace(/^\//, ''));
-            if (fs.existsSync(abs)) fs.unlinkSync(abs);
-        } catch {
-            // ignore
+        // best-effort delete of the files (media rows go with the product via ON DELETE CASCADE)
+        for (const src of [deleted.imageUrl, ...deleted.images.map((m) => m.src), ...deleted.attachments.map((m) => m.src)]) {
+            removeUpload(src);
         }
 
         res.json({ msg: 'Product removed' });
+    } catch (err: any) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// DELETE one extra image or PDF of a product (admin)
+router.delete('/:id/media/:mediaId', auth, checkRole(['admin']), async (req: any, res: any) => {
+    try {
+        const id = parseId(req.params.id);
+        const mediaId = parseId(req.params.mediaId);
+        if (!id || !mediaId) return res.status(400).json({ msg: 'Invalid id' });
+
+        const deleted = await deleteProductMedia(mediaId, id);
+        if (!deleted) return res.status(404).json({ msg: 'Media item not found' });
+        removeUpload(deleted.src);
+
+        res.json({ msg: 'Media item removed' });
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');

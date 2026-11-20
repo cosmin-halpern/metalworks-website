@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import {getApiBaseUrl, getApiUrl} from "../../services/env.ts";
 import { apiFetch } from '../../services/authService';
 
+type ProductImage = { id: number; src: string };
+type ProductAttachment = { id: number; src: string; name: string };
+
 type Product = {
     id: number;
     title: string;
@@ -10,8 +13,12 @@ type Product = {
     price: number;
     priceOnRequest?: boolean;
     imageUrl: string;
+    images?: ProductImage[];
+    attachments?: ProductAttachment[];
     active: boolean;
 };
+
+const fileList = (files: FileList | null) => (files ? Array.from(files) : []);
 
 const ManageProducts = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -23,6 +30,8 @@ const ManageProducts = () => {
     const [price, setPrice] = useState<string>('0');
     const [priceOnRequest, setPriceOnRequest] = useState(false);
     const [image, setImage] = useState<File | null>(null);
+    const [gallery, setGallery] = useState<File[]>([]);
+    const [attachments, setAttachments] = useState<File[]>([]);
 
     // edit
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -32,6 +41,8 @@ const ManageProducts = () => {
     const [editPriceOnRequest, setEditPriceOnRequest] = useState(false);
     const [editActive, setEditActive] = useState<boolean>(true);
     const [editImage, setEditImage] = useState<File | null>(null);
+    const [editGallery, setEditGallery] = useState<File[]>([]);
+    const [editAttachments, setEditAttachments] = useState<File[]>([]);
 
     const API_BASE = getApiUrl();
     const SERVER_URL = getApiBaseUrl() || window.location.origin;
@@ -60,8 +71,12 @@ const ManageProducts = () => {
         setPrice('0');
         setPriceOnRequest(false);
         setImage(null);
-        const input = document.getElementById('product-image-input') as HTMLInputElement | null;
-        if (input) input.value = '';
+        setGallery([]);
+        setAttachments([]);
+        for (const id of ['product-image-input', 'product-gallery-input', 'product-attachments-input']) {
+            const input = document.getElementById(id) as HTMLInputElement | null;
+            if (input) input.value = '';
+        }
     };
 
     const startEdit = (p: Product) => {
@@ -71,9 +86,17 @@ const ManageProducts = () => {
         setEditPrice(String(p.price));
         setEditPriceOnRequest(Boolean(p.priceOnRequest));
         setEditActive(Boolean(p.active));
+        resetEditFiles();
+    };
+
+    const resetEditFiles = () => {
         setEditImage(null);
-        const input = document.getElementById('product-edit-image-input') as HTMLInputElement | null;
-        if (input) input.value = '';
+        setEditGallery([]);
+        setEditAttachments([]);
+        for (const id of ['product-edit-image-input', 'product-edit-gallery-input', 'product-edit-attachments-input']) {
+            const input = document.getElementById(id) as HTMLInputElement | null;
+            if (input) input.value = '';
+        }
     };
 
     const cancelEdit = () => {
@@ -83,7 +106,7 @@ const ManageProducts = () => {
         setEditPrice('0');
         setEditPriceOnRequest(false);
         setEditActive(true);
-        setEditImage(null);
+        resetEditFiles();
     };
 
     const handleCreate = async (e: React.FormEvent) => {
@@ -97,6 +120,8 @@ const ManageProducts = () => {
         formData.append('price', priceOnRequest ? '0' : price);
         formData.append('priceOnRequest', String(priceOnRequest));
         formData.append('image', image);
+        gallery.forEach((f) => formData.append('gallery', f));
+        attachments.forEach((f) => formData.append('attachments', f));
 
         try {
             const res = await apiFetch(`${API_BASE}/products`, {
@@ -131,6 +156,8 @@ const ManageProducts = () => {
         formData.append('priceOnRequest', String(editPriceOnRequest));
         formData.append('active', String(editActive));
         if (editImage) formData.append('image', editImage);
+        editGallery.forEach((f) => formData.append('gallery', f));
+        editAttachments.forEach((f) => formData.append('attachments', f));
 
         try {
             const res = await apiFetch(`${API_BASE}/products/${editingId}`, {
@@ -150,6 +177,21 @@ const ManageProducts = () => {
             alert('Eroare server');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Removes one extra image or PDF right away (the edit form stays open)
+    const handleDeleteMedia = async (productId: number, mediaId: number) => {
+        if (!window.confirm('Ștergi acest fișier?')) return;
+        try {
+            const res = await apiFetch(`${API_BASE}/products/${productId}/media/${mediaId}`, { method: 'DELETE' });
+            if (!res.ok) {
+                alert('Fișierul nu a putut fi șters.');
+                return;
+            }
+            await fetchProducts();
+        } catch {
+            alert('Eroare server');
         }
     };
 
@@ -218,7 +260,7 @@ const ManageProducts = () => {
                             </label>
                         </div>
                         <div className="md:col-span-1">
-                            <label className="block text-sm font-medium mb-1">Imagine</label>
+                            <label className="block text-sm font-medium mb-1">Imagine principală</label>
                             <input
                                 id="product-image-input"
                                 type="file"
@@ -227,6 +269,39 @@ const ManageProducts = () => {
                                 onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
                                 required
                             />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Alte imagini (opțional, mai multe)</label>
+                            <input
+                                id="product-gallery-input"
+                                type="file"
+                                className="w-full"
+                                accept="image/*"
+                                multiple
+                                onChange={(e) => setGallery(fileList(e.target.files))}
+                            />
+                            {gallery.length > 0 && (
+                                <p className="text-xs text-slate-500 mt-1">{gallery.length} imagini selectate</p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Fișiere PDF (opțional, mai multe)</label>
+                            <input
+                                id="product-attachments-input"
+                                type="file"
+                                className="w-full"
+                                accept="application/pdf,.pdf"
+                                multiple
+                                onChange={(e) => setAttachments(fileList(e.target.files))}
+                            />
+                            {attachments.length > 0 && (
+                                <p className="text-xs text-slate-500 mt-1">
+                                    {attachments.map((f) => f.name).join(', ')}
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -315,7 +390,7 @@ const ManageProducts = () => {
                                 </select>
                             </div>
                             <div className="md:col-span-1">
-                                <label className="block text-sm font-medium mb-1">Imagine nouă (opțional)</label>
+                                <label className="block text-sm font-medium mb-1">Imagine principală nouă (opțional)</label>
                                 {editingProduct && (
                                     <div className="mb-2 w-16 h-12 bg-gray-100 rounded overflow-hidden">
                                         <img
@@ -332,6 +407,82 @@ const ManageProducts = () => {
                                     accept="image/*"
                                     onChange={(e) => setEditImage(e.target.files ? e.target.files[0] : null)}
                                 />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Alte imagini</label>
+                                {editingProduct?.images && editingProduct.images.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {editingProduct.images.map((img) => (
+                                            <div key={img.id} className="relative w-20 h-16 bg-gray-100 rounded overflow-hidden">
+                                                <img src={getFullUrl(img.src)} alt="" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteMedia(editingProduct.id, img.id)}
+                                                    className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold leading-5"
+                                                    aria-label="Șterge imaginea"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <input
+                                    id="product-edit-gallery-input"
+                                    type="file"
+                                    className="w-full"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) => setEditGallery(fileList(e.target.files))}
+                                />
+                                <p className="text-xs text-slate-500 mt-1">
+                                    {editGallery.length > 0
+                                        ? `${editGallery.length} imagini noi, se adaugă la salvare`
+                                        : 'Imaginile noi se adaugă la cele existente.'}
+                                </p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Fișiere PDF</label>
+                                {editingProduct?.attachments && editingProduct.attachments.length > 0 && (
+                                    <ul className="mb-2 space-y-1">
+                                        {editingProduct.attachments.map((f) => (
+                                            <li key={f.id} className="flex items-center justify-between gap-2 text-sm bg-gray-50 rounded px-2 py-1">
+                                                <a
+                                                    href={getFullUrl(f.src)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="truncate text-blue-700 hover:underline"
+                                                >
+                                                    {f.name || 'Fișier PDF'}
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteMedia(editingProduct.id, f.id)}
+                                                    className="text-red-600 font-bold"
+                                                    aria-label={`Șterge ${f.name}`}
+                                                >
+                                                    ×
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                <input
+                                    id="product-edit-attachments-input"
+                                    type="file"
+                                    className="w-full"
+                                    accept="application/pdf,.pdf"
+                                    multiple
+                                    onChange={(e) => setEditAttachments(fileList(e.target.files))}
+                                />
+                                <p className="text-xs text-slate-500 mt-1">
+                                    {editAttachments.length > 0
+                                        ? editAttachments.map((f) => f.name).join(', ')
+                                        : 'Fișierele noi se adaugă la cele existente.'}
+                                </p>
                             </div>
                         </div>
 
@@ -377,6 +528,9 @@ const ManageProducts = () => {
                                             <p className="font-bold text-slate-900 truncate">{p.title}</p>
                                             <p className="text-sm text-slate-600 truncate">
                                                 {p.description || '—'}
+                                            </p>
+                                            <p className="text-xs text-slate-500 mt-1">
+                                                {1 + (p.images?.length ?? 0)} imagini · {p.attachments?.length ?? 0} PDF
                                             </p>
                                         </div>
                                         <div className="text-right">

@@ -16,6 +16,7 @@ const ALLOWED_VIDEO_MIMES = new Set(['video/mp4', 'video/webm', 'video/quicktime
 const ALLOWED_VIDEO_EXTS = new Set(['.mp4', '.webm', '.mov']);
 
 const IMAGE_SIZE_LIMIT = 10 * 1024 * 1024;   // 10 MB
+const PRODUCT_FILE_SIZE_LIMIT = 20 * 1024 * 1024; // 20 MB (PDF data sheets)
 const MEDIA_SIZE_LIMIT = 100 * 1024 * 1024;  // 100 MB
 
 const storage = multer.diskStorage({
@@ -56,3 +57,29 @@ export const uploadMedia = multer({
     fileFilter: mediaFilter,
     limits: { fileSize: MEDIA_SIZE_LIMIT },
 });
+
+// Store products: "image" (main) and "gallery" take images, "attachments" takes PDFs
+function productFilter(_req: Request, file: Express.Multer.File, cb: FileFilterCallback) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (file.fieldname === 'attachments') {
+        if (file.mimetype === 'application/pdf' && ext === '.pdf') return cb(null, true);
+        return cb(new Error('Only PDF files are allowed as attachments'));
+    }
+    if (ALLOWED_IMAGE_MIMES.has(file.mimetype) && ALLOWED_IMAGE_EXTS.has(ext)) return cb(null, true);
+    cb(new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed'));
+}
+
+export const uploadProductFiles = multer({
+    storage,
+    fileFilter: productFilter,
+    limits: { fileSize: PRODUCT_FILE_SIZE_LIMIT },
+}).fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'gallery', maxCount: 20 },
+    { name: 'attachments', maxCount: 10 },
+]);
+
+// Browsers send file names as UTF-8 but multer reads them as Latin-1 ("FiÈ™a" instead of "Fișa")
+export function originalFileName(file: Express.Multer.File): string {
+    return Buffer.from(file.originalname, 'latin1').toString('utf8').slice(0, 255);
+}

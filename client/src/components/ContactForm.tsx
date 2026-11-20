@@ -24,13 +24,15 @@ const ContactForm = () => {
     const [searchParams] = useSearchParams();
     // Service pages link here as /contact?serviciu=<slug>
     const preselected = servicePages.find((s) => s.slug === searchParams.get('serviciu'))?.name ?? '';
+    // Store products without a price link here as /contact?produs=<title>
+    const product = searchParams.get('produs')?.trim().slice(0, 200) ?? '';
 
     const [form, setForm] = useState<FormState>({
         name: '',
         email: '',
         phone: '',
-        service: preselected,
-        message: '',
+        service: preselected || (product ? OTHER_SERVICE : ''),
+        message: product ? `Aș dori o ofertă pentru produsul „${product}”.` : '',
         website: '',
     });
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -54,7 +56,7 @@ const ContactForm = () => {
             const res = await fetch(`${getApiUrl()}/contact`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({ ...form, product }),
             });
             const data = await res.json().catch(() => null);
             if (!res.ok) {
@@ -62,8 +64,9 @@ const ContactForm = () => {
                 setError(data?.msg || 'Mesajul nu a putut fi trimis. Vă rugăm să ne sunați la +40 768 515 774.');
                 return;
             }
-            trackEvent('generate_lead', { form: 'contact', service: form.service || OTHER_SERVICE });
-            trackLead(form.service || OTHER_SERVICE);
+            const leadName = product ? `Produs: ${product}` : form.service || OTHER_SERVICE;
+            trackEvent('generate_lead', { form: 'contact', service: leadName });
+            trackLead(leadName);
             setStatus('success');
         } catch {
             setStatus('error');

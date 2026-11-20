@@ -5,6 +5,7 @@ export type ProductRow = {
     title: string;
     description: string;
     price: string; // DECIMAL comes as string with mysql2
+    price_on_request: number; // 0/1
     image_url: string;
     active: number; // 0/1
     created_at: string;
@@ -16,6 +17,7 @@ export type ProductDTO = {
     title: string;
     description: string;
     price: number;
+    priceOnRequest: boolean; // shown as "Cere ofertă" instead of the price, not sold online
     imageUrl: string;
     active: boolean;
     createdAt: string;
@@ -28,6 +30,7 @@ function toDTO(row: ProductRow): ProductDTO {
         title: row.title,
         description: row.description,
         price: Number(row.price),
+        priceOnRequest: Boolean(row.price_on_request),
         imageUrl: row.image_url,
         active: Boolean(row.active),
         createdAt: row.created_at,
@@ -37,7 +40,7 @@ function toDTO(row: ProductRow): ProductDTO {
 
 export async function listActiveProducts(): Promise<ProductDTO[]> {
     const [rows] = await pool.query(
-        `SELECT id, title, description, price, image_url, active, created_at, updated_at
+        `SELECT id, title, description, price, price_on_request, image_url, active, created_at, updated_at
          FROM products
          WHERE active = 1
          ORDER BY created_at DESC
@@ -46,10 +49,32 @@ export async function listActiveProducts(): Promise<ProductDTO[]> {
     return (rows as ProductRow[]).map(toDTO);
 }
 
+// Admin list: inactive products too, so they can be edited and switched back on
+export async function listAllProducts(): Promise<ProductDTO[]> {
+    const [rows] = await pool.query(
+        `SELECT id, title, description, price, price_on_request, image_url, active, created_at, updated_at
+         FROM products
+         ORDER BY created_at DESC`
+    );
+    return (rows as ProductRow[]).map(toDTO);
+}
+
+export async function findActiveProductByTitle(title: string): Promise<ProductDTO | null> {
+    const [rows] = await pool.query(
+        `SELECT id, title, description, price, price_on_request, image_url, active, created_at, updated_at
+         FROM products
+         WHERE active = 1 AND title = ?
+         LIMIT 1`,
+        [title]
+    );
+    const row = (rows as ProductRow[])[0];
+    return row ? toDTO(row) : null;
+}
+
 export async function getProductById(id: number): Promise<ProductDTO | null> {
     const [rows] = await pool.query(
         `
-    SELECT id, title, description, price, image_url, active, created_at, updated_at
+    SELECT id, title, description, price, price_on_request, image_url, active, created_at, updated_at
     FROM products
     WHERE id = ?
     LIMIT 1
@@ -64,15 +89,16 @@ export async function createProduct(input: {
     title: string;
     description: string;
     price: number;
+    priceOnRequest: boolean;
     imageUrl: string;
     active: boolean;
 }): Promise<ProductDTO> {
     const [result] = await pool.query(
         `
-    INSERT INTO products (title, description, price, image_url, active)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO products (title, description, price, price_on_request, image_url, active)
+    VALUES (?, ?, ?, ?, ?, ?)
     `,
-        [input.title, input.description, input.price, input.imageUrl, input.active ? 1 : 0]
+        [input.title, input.description, input.price, input.priceOnRequest ? 1 : 0, input.imageUrl, input.active ? 1 : 0]
     );
 
     const id = (result as any).insertId as number;
@@ -87,6 +113,7 @@ export async function updateProduct(
         title: string;
         description: string;
         price: number;
+        priceOnRequest: boolean;
         imageUrl: string;
         active: boolean;
     }>
@@ -98,6 +125,7 @@ export async function updateProduct(
         title: input.title ?? existing.title,
         description: input.description ?? existing.description,
         price: typeof input.price === 'number' ? input.price : existing.price,
+        priceOnRequest: typeof input.priceOnRequest === 'boolean' ? input.priceOnRequest : existing.priceOnRequest,
         imageUrl: input.imageUrl ?? existing.imageUrl,
         active: typeof input.active === 'boolean' ? input.active : existing.active,
     };
@@ -105,10 +133,10 @@ export async function updateProduct(
     await pool.query(
         `
     UPDATE products
-    SET title = ?, description = ?, price = ?, image_url = ?, active = ?
+    SET title = ?, description = ?, price = ?, price_on_request = ?, image_url = ?, active = ?
     WHERE id = ?
     `,
-        [next.title, next.description, next.price, next.imageUrl, next.active ? 1 : 0, id]
+        [next.title, next.description, next.price, next.priceOnRequest ? 1 : 0, next.imageUrl, next.active ? 1 : 0, id]
     );
 
     return await getProductById(id);

@@ -54,6 +54,7 @@ type ProductRowForOrder = {
     id: number;
     title: string;
     price: string; // DECIMAL -> string
+    price_on_request: number; // 0/1
     image_url: string;
     active: number; // 0/1
     track_stock: number; // 0/1
@@ -174,7 +175,7 @@ export async function createOrderTransactional(
         const placeholders = ids.map(() => '?').join(',');
         const [productRows] = await conn.query(
             `
-                SELECT id, title, price, image_url, active, track_stock, stock
+                SELECT id, title, price, price_on_request, image_url, active, track_stock, stock
                 FROM products
                 WHERE id IN (${placeholders}) AND active = 1
                     FOR UPDATE
@@ -189,6 +190,14 @@ export async function createOrderTransactional(
         const missing = input.items.find((i) => !byId.has(i.productId));
         if (missing) {
             throw new Error('Un produs din coș nu mai este disponibil.');
+        }
+
+        // "Cere ofertă" products have no real price and can't be bought online
+        const onRequest = products.find((p) => p.price_on_request);
+        if (onRequest) {
+            const err = new Error(`Produs disponibil doar la cerere de ofertă: ${onRequest.title}`);
+            (err as any).code = 'PRICE_ON_REQUEST';
+            throw err;
         }
 
         // 2) Stock check + decrement

@@ -8,6 +8,7 @@ type Product = {
     title: string;
     description?: string;
     price: number;
+    priceOnRequest?: boolean;
     imageUrl: string;
     active: boolean;
 };
@@ -20,6 +21,7 @@ const ManageProducts = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState<string>('0');
+    const [priceOnRequest, setPriceOnRequest] = useState(false);
     const [image, setImage] = useState<File | null>(null);
 
     // edit
@@ -27,6 +29,7 @@ const ManageProducts = () => {
     const [editTitle, setEditTitle] = useState('');
     const [editDescription, setEditDescription] = useState('');
     const [editPrice, setEditPrice] = useState<string>('0');
+    const [editPriceOnRequest, setEditPriceOnRequest] = useState(false);
     const [editActive, setEditActive] = useState<boolean>(true);
     const [editImage, setEditImage] = useState<File | null>(null);
 
@@ -45,8 +48,9 @@ const ManageProducts = () => {
     }, []);
 
     const fetchProducts = async () => {
-        const res = await fetch(`${API_BASE}/products`);
-        const data = await res.json();
+        // Admin list includes inactive products (the public /products only has active ones)
+        const res = await apiFetch(`${API_BASE}/products/admin`);
+        const data = await res.json().catch(() => []);
         setProducts(Array.isArray(data) ? data : []);
     };
 
@@ -54,6 +58,7 @@ const ManageProducts = () => {
         setTitle('');
         setDescription('');
         setPrice('0');
+        setPriceOnRequest(false);
         setImage(null);
         const input = document.getElementById('product-image-input') as HTMLInputElement | null;
         if (input) input.value = '';
@@ -64,6 +69,7 @@ const ManageProducts = () => {
         setEditTitle(p.title);
         setEditDescription(p.description || '');
         setEditPrice(String(p.price));
+        setEditPriceOnRequest(Boolean(p.priceOnRequest));
         setEditActive(Boolean(p.active));
         setEditImage(null);
         const input = document.getElementById('product-edit-image-input') as HTMLInputElement | null;
@@ -75,6 +81,7 @@ const ManageProducts = () => {
         setEditTitle('');
         setEditDescription('');
         setEditPrice('0');
+        setEditPriceOnRequest(false);
         setEditActive(true);
         setEditImage(null);
     };
@@ -87,7 +94,8 @@ const ManageProducts = () => {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
-        formData.append('price', price);
+        formData.append('price', priceOnRequest ? '0' : price);
+        formData.append('priceOnRequest', String(priceOnRequest));
         formData.append('image', image);
 
         try {
@@ -119,7 +127,8 @@ const ManageProducts = () => {
         const formData = new FormData();
         formData.append('title', editTitle);
         formData.append('description', editDescription);
-        formData.append('price', editPrice);
+        formData.append('price', editPriceOnRequest ? '0' : editPrice);
+        formData.append('priceOnRequest', String(editPriceOnRequest));
         formData.append('active', String(editActive));
         if (editImage) formData.append('image', editImage);
 
@@ -191,12 +200,22 @@ const ManageProducts = () => {
                             <input
                                 type="number"
                                 className="w-full p-2 border rounded"
-                                value={price}
+                                value={priceOnRequest ? '' : price}
                                 onChange={(e) => setPrice(e.target.value)}
                                 min={0}
                                 step="0.01"
-                                required
+                                required={!priceOnRequest}
+                                disabled={priceOnRequest}
+                                placeholder={priceOnRequest ? 'Cere ofertă' : undefined}
                             />
+                            <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                    type="checkbox"
+                                    checked={priceOnRequest}
+                                    onChange={(e) => setPriceOnRequest(e.target.checked)}
+                                />
+                                Fără preț – afișează „Cere ofertă”
+                            </label>
                         </div>
                         <div className="md:col-span-1">
                             <label className="block text-sm font-medium mb-1">Imagine</label>
@@ -267,12 +286,22 @@ const ManageProducts = () => {
                                 <input
                                     type="number"
                                     className="w-full p-2 border rounded"
-                                    value={editPrice}
+                                    value={editPriceOnRequest ? '' : editPrice}
                                     onChange={(e) => setEditPrice(e.target.value)}
                                     min={0}
                                     step="0.01"
-                                    required
+                                    required={!editPriceOnRequest}
+                                    disabled={editPriceOnRequest}
+                                    placeholder={editPriceOnRequest ? 'Cere ofertă' : undefined}
                                 />
+                                <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={editPriceOnRequest}
+                                        onChange={(e) => setEditPriceOnRequest(e.target.checked)}
+                                    />
+                                    Fără preț – „Cere ofertă”
+                                </label>
                             </div>
                             <div className="md:col-span-1">
                                 <label className="block text-sm font-medium mb-1">Activ</label>
@@ -351,7 +380,9 @@ const ManageProducts = () => {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-bold text-slate-900">{p.price} RON</p>
+                                            <p className="font-bold text-slate-900">
+                                                {p.priceOnRequest ? 'Cere ofertă' : `${p.price} RON`}
+                                            </p>
                                             <p className={`text-xs font-bold ${p.active ? 'text-green-700' : 'text-red-700'}`}>
                                                 {p.active ? 'ACTIV' : 'INACTIV'}
                                             </p>

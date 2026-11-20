@@ -204,6 +204,9 @@ router.post('/', async (req, res) => {
         if (err?.code === 'INSUFFICIENT_STOCK') {
             return res.status(409).json({ msg: 'Unul sau mai multe produse nu mai sunt disponibile în cantitatea solicitată.' });
         }
+        if (err?.code === 'PRICE_ON_REQUEST') {
+            return res.status(409).json({ msg: 'Unul dintre produse se vinde doar pe bază de ofertă. Scoateți-l din coș și cereți o ofertă din pagina Magazin.' });
+        }
         res.status(500).send('Server Error');
     }
 });

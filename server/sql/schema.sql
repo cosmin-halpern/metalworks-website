@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS products (
     title       VARCHAR(255)     NOT NULL,
     description TEXT             NOT NULL,
     price       DECIMAL(10,2)    NOT NULL DEFAULT 0,
+    price_on_request TINYINT(1)  NOT NULL DEFAULT 0,
     image_url   VARCHAR(1024)    NOT NULL,
     active      TINYINT(1)       NOT NULL DEFAULT 1,
     track_stock TINYINT(1)       NOT NULL DEFAULT 0,

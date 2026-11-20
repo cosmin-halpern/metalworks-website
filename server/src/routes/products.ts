@@ -10,6 +10,7 @@ import {
     createProduct,
     deleteProductById,
     listActiveProducts,
+    listAllProducts,
     updateProduct,
 } from '../repositories/productRepo.js';
 
@@ -18,17 +19,22 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Multipart form fields arrive as strings
+const formBoolean = z.preprocess((v) => v === 'true' || v === true, z.boolean());
+
 const createProductSchema = z.object({
     title: z.string().min(1).max(200),
     description: z.string().optional().default(''),
     price: z.coerce.number().min(0).default(0),
+    priceOnRequest: formBoolean.optional().default(false),
 });
 
 const updateProductSchema = z.object({
     title: z.string().min(1).max(200).optional(),
     description: z.string().optional(),
     price: z.coerce.number().min(0).optional(),
-    active: z.preprocess((v) => v === 'true' || v === true, z.boolean()).optional(),
+    priceOnRequest: formBoolean.optional(),
+    active: formBoolean.optional(),
 });
 
 function parseId(idParam: string): number | null {
@@ -42,6 +48,16 @@ router.get('/', async (_req, res) => {
     try {
         const products = await listActiveProducts();
         res.json(products);
+    } catch (err: any) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// GET all products including inactive ones (admin)
+router.get('/admin', auth, checkRole(['admin']), async (_req, res) => {
+    try {
+        res.json(await listAllProducts());
     } catch (err: any) {
         console.error(err);
         res.status(500).send('Server Error');

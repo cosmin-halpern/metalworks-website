@@ -10,6 +10,7 @@ type Product = {
     title: string;
     description?: string;
     price: number;
+    priceOnRequest?: boolean; // no price shown, "Cere ofertă" instead of "Adaugă în coș"
     imageUrl: string; // "/uploads/..."
     active: boolean;
 };
@@ -48,6 +49,8 @@ const Store = () => {
 
     const isInCart = (productId: string) => items.some((it) => it.productId === productId);
 
+    const quoteUrl = (p: Product) => `/contact?produs=${encodeURIComponent(p.title)}`;
+
 
     if (loading) {
         return (
@@ -70,7 +73,9 @@ const Store = () => {
                     <div className="flex items-end justify-between gap-4 mb-8">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900">Produse</h2>
-                            <p className="text-gray-600 mt-1">Alege produsul și apasă „Adaugă în coș”.</p>
+                            <p className="text-gray-600 mt-1">
+                                Alege produsul și apasă „Adaugă în coș”, sau „Cere ofertă” pentru produsele la comandă.
+                            </p>
                         </div>
                     </div>
 
@@ -96,6 +101,14 @@ const Store = () => {
                                         />
 
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            {p.priceOnRequest ? (
+                                                <Link
+                                                    to={quoteUrl(p)}
+                                                    className="bg-white text-gray-900 px-6 py-2 rounded-full font-bold shadow-lg hover:bg-gray-100"
+                                                >
+                                                    Cere ofertă
+                                                </Link>
+                                            ) : (
                                             <button
                                                 type="button"
                                                 onClick={() =>
@@ -110,15 +123,25 @@ const Store = () => {
                                             >
                                                 {inCart ? 'Adaugă încă unul' : 'Adaugă în coș'}
                                             </button>
+                                            )}
                                         </div>
                                     </div>
 
                                     <div className="p-6 flex-1">
                                         <div className="flex items-start justify-between gap-4">
                                             <h3 className="text-xl font-bold text-gray-900 mb-2">{p.title}</h3>
-                                            <div className="text-gray-900 font-bold whitespace-nowrap">
-                                                {p.price} RON
-                                            </div>
+                                            {p.priceOnRequest ? (
+                                                <Link
+                                                    to={quoteUrl(p)}
+                                                    className="text-primary font-bold whitespace-nowrap hover:underline"
+                                                >
+                                                    Cere ofertă
+                                                </Link>
+                                            ) : (
+                                                <div className="text-gray-900 font-bold whitespace-nowrap">
+                                                    {p.price} RON
+                                                </div>
+                                            )}
                                         </div>
 
                                         {p.description ? (

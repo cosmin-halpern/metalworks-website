@@ -28,8 +28,7 @@ const Header = () => {
         { name: 'Acasă', href: '/' },
         { name: 'Servicii', href: '/servicii' },
         { name: 'Proiectele noastre', href: '/proiecte' },
-        // Magazin (/magazin) is hidden while the store has no products — re-add it here,
-        // in public/sitemap.xml, and drop "noindex" for it in public/seo-routes.json
+        { name: 'Magazin', href: '/magazin' },
         { name: 'Clienți', href: '/clienti' },
         { name: 'Contact', href: '/contact' },
     ];
